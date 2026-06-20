@@ -9,8 +9,6 @@ import Vendors from "./pages/Vendors";
 import RiskAnalysis from "./pages/RiskAnalysis";
 import Compliance from "./pages/Compliance";
 import ContractAI from "./pages/ContractAI";
-import Reports from "./pages/Reports";
-import Settings from "./pages/Settings";
 
 import { 
   mockVendors, 
@@ -32,6 +30,23 @@ export default function App() {
   // Interactions Shared States
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [heatmapFilter, setHeatmapFilter] = useState(null);
+
+  const getBgStyle = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return "url('/cyber_sentinel_bg.png')";
+      case "vendors":
+        return "url('/cyber_vendors_bg.png')";
+      case "riskAnalysis":
+        return "url('/cyber_risk_bg.png')";
+      case "compliance":
+        return "url('/cyber_compliance_bg.png')";
+      case "contractAI":
+        return "url('/cyber_contract_bg.png')";
+      default:
+        return "url('/cyber_sentinel_bg.png')";
+    }
+  };
 
   // Router dispatcher
   const renderTabContent = () => {
@@ -77,20 +92,6 @@ export default function App() {
         return (
           <ContractAI />
         );
-      case "reports":
-        return (
-          <Reports 
-            vendors={vendors}
-          />
-        );
-      case "settings":
-        return (
-          <Settings 
-            vendors={vendors}
-            setVendors={setVendors}
-            setNotifications={setNotifications}
-          />
-        );
       default:
         return (
           <div className="p-6 text-center text-slate-500 text-sm">
@@ -102,6 +103,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 flex font-sans selection:bg-blue-600/30 selection:text-white relative overflow-hidden">
+      {/* Dynamic Background Image HUD Layer with smooth transition */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-fixed transition-all duration-1000 ease-in-out pointer-events-none z-0"
+        style={{
+          backgroundImage: `linear-gradient(rgba(3, 7, 18, 0.88), rgba(3, 7, 18, 0.94)), ${getBgStyle()}`
+        }}
+      ></div>
+
       {/* Background Graphic Accents */}
       <div className="absolute top-0 right-0 w-[45rem] h-[45rem] bg-blue-900/10 rounded-full blur-[10rem] pointer-events-none z-0"></div>
       <div className="absolute bottom-0 left-0 w-[35rem] h-[35rem] bg-indigo-900/5 rounded-full blur-[8rem] pointer-events-none z-0"></div>

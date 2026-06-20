@@ -22,8 +22,6 @@ export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollaps
     { id: "riskAnalysis", label: "Risk Analysis", icon: Activity },
     { id: "compliance", label: "Compliance", icon: FileCheck },
     { id: "contractAI", label: "Contract AI", icon: Database },
-    { id: "reports", label: "Reports", icon: FileText },
-    { id: "settings", label: "Settings", icon: Sliders },
   ];
 
   return (
