@@ -10,22 +10,81 @@ import RiskAnalysis from "./pages/RiskAnalysis";
 import Compliance from "./pages/Compliance";
 import ContractAI from "./pages/ContractAI";
 
-import { 
-  mockVendors, 
-  mockRecentActivities, 
-  mockExpiryAlerts 
-} from "./data/mockData";
-
 export default function App() {
   // Navigation & Shell States
   const [activeTab, setActiveTab] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
 
   // App Data States
-  const [vendors, setVendors] = useState(mockVendors);
-  const [notifications, setNotifications] = useState(mockRecentActivities.slice(0, 3));
-  const [recentActivities, setRecentActivities] = useState(mockRecentActivities);
-  const [expiryAlerts, setExpiryAlerts] = useState(mockExpiryAlerts);
+  const [vendors, setVendors] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [expiryAlerts, setExpiryAlerts] = useState([]);
+  const [contracts, setContracts] = useState([]);
+  const [complianceStandards, setComplianceStandards] = useState({});
+
+  // Load all dashboard states dynamically from JSON
+  React.useEffect(() => {
+    fetch("/data.json")
+      .then(res => res.json())
+      .then(data => {
+        if (data.vendors) {
+          setVendors(data.vendors);
+          
+          // Generate expiry alerts dynamically from vendor certifications status
+          const alerts = [];
+          data.vendors.forEach(v => {
+            if (v.certifications) {
+              v.certifications.forEach(c => {
+                if (c.status === "Expired") {
+                  alerts.push({
+                    id: `exp-${v.id}-${c.name}`,
+                    vendorName: v.name,
+                    certName: c.name,
+                    status: "expired",
+                    expiryDate: c.expiryDate
+                  });
+                }
+              });
+            }
+          });
+          setExpiryAlerts(alerts);
+        }
+        if (data.recentActivities) {
+          setRecentActivities(data.recentActivities);
+          setNotifications(data.recentActivities.slice(0, 3));
+        }
+        if (data.contracts) {
+          setContracts(data.contracts);
+        }
+        if (data.complianceStandards) {
+          setComplianceStandards(data.complianceStandards);
+        }
+      })
+      .catch(err => console.error("Error loading dynamic data:", err));
+  }, []);
+
+  // Calculate dynamic Threat Level
+  const getDynamicThreatLevel = () => {
+    if (!vendors || vendors.length === 0) {
+      return { label: "SECURE", color: "text-emerald-400", border: "border-emerald-500/20", bg: "bg-emerald-500/10" };
+    }
+    
+    const averageRisk = vendors.reduce((acc, curr) => acc + curr.riskScore, 0) / vendors.length;
+    const hasBreaches = vendors.some(v => v.activeBreaches > 0);
+    const hasCritical = vendors.some(v => v.riskLevel === "Critical");
+    const hasHigh = vendors.some(v => v.riskLevel === "High");
+
+    if (hasBreaches || hasCritical || averageRisk > 70) {
+      return { label: "CRITICAL", color: "text-red-400", border: "border-red-500/30", bg: "bg-red-500/10" };
+    }
+    if (hasHigh || averageRisk > 45) {
+      return { label: "ELEVATED", color: "text-orange-400", border: "border-orange-500/30", bg: "bg-orange-500/10" };
+    }
+    return { label: "SECURE", color: "text-emerald-400", border: "border-emerald-500/30", bg: "bg-emerald-500/10" };
+  };
+
+  const threatLevel = getDynamicThreatLevel();
 
   // Interactions Shared States
   const [selectedVendor, setSelectedVendor] = useState(null);
@@ -86,11 +145,12 @@ export default function App() {
           <Compliance 
             vendors={vendors}
             setNotifications={setNotifications}
+            complianceStandards={complianceStandards}
           />
         );
       case "contractAI":
         return (
-          <ContractAI />
+          <ContractAI contracts={contracts} setContracts={setContracts} />
         );
       default:
         return (
@@ -130,6 +190,7 @@ export default function App() {
           activeTab={activeTab} 
           notifications={notifications} 
           setNotifications={setNotifications}
+          threatLevel={threatLevel}
         />
 
         {/* View Frame */}

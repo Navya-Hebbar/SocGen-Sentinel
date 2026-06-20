@@ -12,20 +12,103 @@ import {
   RefreshCw,
   Info
 } from "lucide-react";
-import { mockContractAIContracts } from "../data/mockData";
+export default function ContractAI({ contracts, setContracts }) {
+  const [selectedContractId, setSelectedContractId] = useState("");
+  const [contract, setContract] = useState(null);
 
-export default function ContractAI() {
-  const [selectedContractId, setSelectedContractId] = useState(mockContractAIContracts[0].id);
-  const [contract, setContract] = useState(mockContractAIContracts[0]);
+  useEffect(() => {
+    if (contracts && contracts.length > 0 && !selectedContractId) {
+      setSelectedContractId(contracts[0].id);
+      setContract(contracts[0]);
+    }
+  }, [contracts, selectedContractId]);
   
   // Loading states
   const [scanning, setScanning] = useState(false);
   const [progressText, setProgressText] = useState("");
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setScanning(true);
+    setProgressText("Initializing AI OCR Engine...");
+    
+    setTimeout(() => {
+      setProgressText("Identifying legal nodes & clause structures...");
+    }, 1000);
+    
+    setTimeout(() => {
+      setProgressText("Evaluating against SocGen Compliance Rules...");
+    }, 2000);
+
+    setTimeout(() => {
+      const fileName = file.name;
+      let parsedVendorName = "Uploaded Vendor";
+      const parts = fileName.split(/[_\-\s\.]/);
+      if (parts.length > 0 && parts[0].toLowerCase() !== "contract" && parts[0].toLowerCase() !== "sla") {
+        parsedVendorName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+      }
+
+      const customClauses = [];
+      const lowerName = fileName.toLowerCase();
+      
+      if (lowerName.includes("aws") || lowerName.includes("cloud") || lowerName.includes("server") || lowerName.includes("snowflake")) {
+        customClauses.push({
+          clauseText: "Section 8.2: Service Provider reserves the right to migrate client database logs across availability regions for load balance management without notifying.",
+          riskSeverity: "Moderate",
+          riskExplanation: "Data migration across geographic regions violates GDPR compliance and internal sovereign security guidelines.",
+          recommendedFix: "Restrict storage to specified regions (e.g. EU or US only) and require prior consent for regional transfers."
+        });
+      }
+      
+      if (lowerName.includes("sla") || lowerName.includes("agreement") || lowerName.includes("service") || lowerName.includes("mfa")) {
+        customClauses.push({
+          clauseText: "Section 4.1: Target SLA availability is set to 99.0% computed monthly, excluding emergency updates.",
+          riskSeverity: "Critical",
+          riskExplanation: "99.0% SLA uptime permits over 7 hours of outage per month, which is unacceptable for transactional interfaces.",
+          recommendedFix: "Renegotiate uptime target to 99.99% and establish service credits for SLA breaches."
+        });
+      }
+
+      if (customClauses.length === 0) {
+        customClauses.push({
+          clauseText: "Section 15.3: Either party may terminate this Agreement without cause upon ninety (90) days written notice.",
+          riskSeverity: "Moderate",
+          riskExplanation: "90 days termination without cause is too short for critical infrastructure partners, risking operational continuity.",
+          recommendedFix: "Renegotiate termination without cause to 180 days with transition assistance requirements."
+        });
+        customClauses.push({
+          clauseText: "Section 11.2: Vendor liability for cyber breaches is capped at the fees paid in the preceding three (3) months.",
+          riskSeverity: "Critical",
+          riskExplanation: "Extremely low liability cap fails to protect the bank against costly notification and recovery expenses following breaches.",
+          recommendedFix: "Renegotiate to exclude cyber breaches from the limitation of liability cap entirely, or set a minimum cap of $5,000,000."
+        });
+      }
+
+      const newContract = {
+        id: `c-${Date.now()}`,
+        docName: fileName,
+        vendorName: parsedVendorName,
+        uploadDate: new Date().toISOString().split('T')[0],
+        aiReviewStatus: "Flagged",
+        overallRisk: customClauses.some(cl => cl.riskSeverity === "Critical") ? "Critical" : "Moderate",
+        clauses: customClauses
+      };
+
+      if (setContracts) {
+        setContracts(prev => [newContract, ...prev]);
+      }
+      setSelectedContractId(newContract.id);
+      setContract(newContract);
+      setScanning(false);
+    }, 3000);
+  };
+
   // Select sample contract
   const handleSelectContract = (id) => {
     setSelectedContractId(id);
-    const doc = mockContractAIContracts.find(c => c.id === id);
+    const doc = contracts.find(c => c.id === id);
     if (doc) {
       setScanning(true);
       setProgressText("Initializing AI OCR Engine...");
@@ -70,7 +153,7 @@ export default function ContractAI() {
           <p className="text-xs text-slate-500 mt-0.5 font-light">NLP legal parser highlights high-risk vendor SLA liabilities automatically</p>
         </div>
         <div className="flex gap-2">
-          {mockContractAIContracts.map(c => (
+          {contracts && contracts.map(c => (
             <button
               key={c.id}
               onClick={() => handleSelectContract(c.id)}
@@ -97,9 +180,19 @@ export default function ContractAI() {
             <p className="text-xs text-slate-500 mt-0.5">Upload a PDF contract to trigger NLP audit check</p>
           </div>
 
-          <div className="border border-dashed border-slate-800 hover:border-blue-500/50 rounded-xl p-6 text-center cursor-pointer transition-colors my-5 flex flex-col items-center justify-center flex-grow bg-slate-900/10">
-            <UploadCloud className="w-8 h-8 text-slate-500 mb-3" />
-            <span className="text-xs font-semibold text-slate-300">Drag & drop contract files here</span>
+          <div 
+            onClick={() => document.getElementById("contract-file-upload").click()}
+            className="border border-dashed border-slate-800 hover:border-blue-500/50 rounded-xl p-6 text-center cursor-pointer transition-colors my-5 flex flex-col items-center justify-center flex-grow bg-slate-900/10 group"
+          >
+            <input 
+              type="file" 
+              id="contract-file-upload" 
+              className="hidden" 
+              accept=".pdf,.txt,.docx" 
+              onChange={handleFileUpload} 
+            />
+            <UploadCloud className="w-8 h-8 text-slate-500 mb-3 group-hover:text-blue-500 transition-colors" />
+            <span className="text-xs font-semibold text-slate-300 group-hover:text-white transition-colors">Click to upload SLA document</span>
             <span className="text-[10px] text-slate-600 mt-1">Accepts PDF, DOCX, TXT (Max 25MB)</span>
           </div>
 

@@ -1,0 +1,22 @@
+{
+  "vendors": [],
+  "recentActivities": [],
+  "contracts": [],
+  "complianceStandards": {
+    "SOC2": [
+      { "id": "req-s1", "name": "CC6.1 - Logical Access Control", "desc": "MFA, single sign-on, and endpoint protection must be active for all staff." },
+      { "id": "req-s2", "name": "CC6.3 - Perimeter Defenses", "desc": "Vulnerability scanners, firewall rules, and intrusion alarms must be reviewed monthly." },
+      { "id": "req-s3", "name": "CC7.1 - Vulnerability Management", "desc": "Penetration tests must be conducted annually and critical findings patched within 30 days." }
+    ],
+    "ISO27001": [
+      { "id": "req-i1", "name": "A.9.2 - User Access Mgmt", "desc": "Formal authorization process and periodic reviews for privileged developer roles." },
+      { "id": "req-i2", "name": "A.12.6 - Tech Vulnerabilities", "desc": "System patches must be cataloged and deployed systematically based on severity levels." },
+      { "id": "req-i3", "name": "A.10.1 - Cryptographic Controls", "desc": "Backup files and sensitive transaction tables must be encrypted at rest and in transit." }
+    ],
+    "GDPR": [
+      { "id": "req-g1", "name": "Article 32 - Security of Processing", "desc": "Pseudo-anonymization and systematic log auditing must be enforced on user database assets." },
+      { "id": "req-g2", "name": "Article 28 - Subprocessor Agreements", "desc": "Formal vendor contracts must declare all downstream subprocessors sharing customer records." },
+      { "id": "req-g3", "name": "Article 33 - Breach Notification", "desc": "Formal policies must guarantee client notification of security incidents within 72 hours." }
+    ]
+  }
+}

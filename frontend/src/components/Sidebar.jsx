@@ -108,29 +108,6 @@ export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollaps
         </nav>
       </div>
 
-      {/* User Section */}
-      <div className="p-3 border-t border-slate-900">
-        <div className={`flex items-center gap-3 ${collapsed ? "justify-center" : ""}`}>
-          <div className="relative flex-shrink-0">
-            <div className="w-9 h-9 rounded-full bg-blue-950 border border-blue-800 flex items-center justify-center text-blue-400 font-bold font-display text-sm">
-              NH
-            </div>
-            <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-slate-950"></span>
-          </div>
-          {!collapsed && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="overflow-hidden"
-            >
-              <p className="text-sm font-semibold text-white truncate">Navya Hebbar</p>
-              <p className="text-xs text-slate-500 truncate flex items-center gap-1">
-                <Lock className="w-3 h-3 text-blue-500/80" /> Risk Security Lead
-              </p>
-            </motion.div>
-          )}
-        </div>
-      </div>
     </motion.div>
   );
 }

@@ -383,8 +383,18 @@ export default function RiskAnalysis({ vendors, setVendors, setNotifications }) 
 
         </div>
       ) : (
-        <div className="text-center py-10 text-slate-500 text-sm">
-          No vendors found. Please register a vendor first.
+        <div className="flex flex-col items-center justify-center p-12 text-center glass-panel rounded-2xl max-w-xl mx-auto space-y-6 relative overflow-hidden my-12">
+          <div className="radial-glow absolute inset-0"></div>
+          <div className="cyber-scanner"></div>
+          <div className="p-4 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400">
+            <Flame className="w-10 h-10 animate-pulse" />
+          </div>
+          <div className="space-y-2 z-10">
+            <h3 className="font-display font-semibold text-lg text-white">Simulation Vault Offline</h3>
+            <p className="text-xs text-slate-400 leading-relaxed font-light font-sans">
+              No vendors registered in SecOps Catalog. Load data at <code className="text-blue-400 bg-slate-900 px-1.5 py-0.5 rounded">public/data.json</code> or register one manually to model threat controls.
+            </p>
+          </div>
         </div>
       )}
     </div>

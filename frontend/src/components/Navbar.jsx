@@ -11,7 +11,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 
-export default function Navbar({ activeTab, notifications, setNotifications }) {
+export default function Navbar({ activeTab, notifications, setNotifications, threatLevel = {} }) {
   const [showNotifications, setShowNotifications] = useState(false);
 
   const getBreadcrumb = () => {
@@ -63,10 +63,12 @@ export default function Navbar({ activeTab, notifications, setNotifications }) {
         </div>
 
         {/* Global Risk Threat Level Indicator */}
-        <div className="flex items-center gap-2 bg-slate-900/60 border border-slate-800/80 rounded-lg px-3 py-1.5 text-xs text-slate-400">
-          <ShieldAlert className="w-3.5 h-3.5 text-orange-400 animate-pulse" />
+        <div className={`flex items-center gap-2 bg-slate-900/60 border ${threatLevel.border || "border-slate-800/80"} rounded-lg px-3 py-1.5 text-xs text-slate-400`}>
+          <ShieldAlert className={`w-3.5 h-3.5 ${threatLevel.color || "text-orange-400"} ${threatLevel.label !== "SECURE" ? "animate-pulse" : ""}`} />
           <span className="hidden sm:inline">Threat Level:</span>
-          <span className="font-semibold text-orange-400 tracking-wider">ELEVATED</span>
+          <span className={`font-semibold ${threatLevel.color || "text-orange-400"} tracking-wider`}>
+            {threatLevel.label || "ELEVATED"}
+          </span>
         </div>
 
         {/* Notification Bell */}

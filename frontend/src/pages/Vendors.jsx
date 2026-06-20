@@ -34,7 +34,11 @@ export default function Vendors({
     riskScore: 50,
     SOC2: "Compliant",
     GDPR: "Compliant",
-    ISO27001: "Compliant"
+    ISO27001: "Compliant",
+    subprocessors: 3,
+    dataAssetsShared: "",
+    contactName: "",
+    contactEmail: ""
   });
 
   // Handle adding vendor
@@ -75,11 +79,11 @@ export default function Vendors({
         { name: "ISO 27001", status: newVendor.ISO27001, expiryDate: "2027-08-30" }
       ],
       contacts: {
-        name: "Security Operations",
-        email: `sec-ops@${newVendor.name.toLowerCase().replace(/\s+/g, "")}.com`
+        name: newVendor.contactName || "Security Operations",
+        email: newVendor.contactEmail || `sec-ops@${newVendor.name.toLowerCase().replace(/\s+/g, "")}.com`
       },
-      subprocessors: Math.floor(Math.random() * 12) + 2,
-      dataAssetsShared: score > 60 ? "Customer PII, Financial Transaction Data" : "Public Marketing Assets"
+      subprocessors: parseInt(newVendor.subprocessors) || 0,
+      dataAssetsShared: newVendor.dataAssetsShared || "Standard Public Marketing Assets"
     };
 
     setVendors([vendorObj, ...vendors]);
@@ -93,7 +97,11 @@ export default function Vendors({
       riskScore: 50,
       SOC2: "Compliant",
       GDPR: "Compliant",
-      ISO27001: "Compliant"
+      ISO27001: "Compliant",
+      subprocessors: 3,
+      dataAssetsShared: "",
+      contactName: "",
+      contactEmail: ""
     });
   };
 
@@ -137,13 +145,38 @@ export default function Vendors({
 
   // AI recommendations generator (precise output model)
   const getAiRecommendation = (vendor) => {
-    if (vendor.riskLevel === "Critical" || vendor.riskLevel === "High") {
-      return "Schedule an immediate compliance review and limit database access permissions.";
+    const recs = [];
+    if (vendor.complianceStatus?.SOC2 !== "Compliant") {
+      recs.push("Request updated SOC 2 Type II audit report for validation.");
     }
-    if (vendor.riskLevel === "Medium") {
-      return "Request updated SOC2 audit documents and monitor network connection logs.";
+    if (vendor.complianceStatus?.ISO27001 !== "Compliant") {
+      recs.push("Enforce AES-256 database/backup encryption to align with ISO 27001 standard.");
     }
-    return "Maintain routine automated certificate scans.";
+    if (vendor.complianceStatus?.GDPR !== "Compliant") {
+      recs.push("Draft and execute standard GDPR Data Processing Agreement (DPA).");
+    }
+    
+    if (vendor.riskFactors && vendor.riskFactors.length > 0) {
+      vendor.riskFactors.forEach(factor => {
+        const text = factor.toLowerCase();
+        if (text.includes("credential") || text.includes("leak") || text.includes("bypass")) {
+          recs.push("Perform credential sweep, revoke old API keys, and enforce strict MFA.");
+        } else if (text.includes("vulnerability") || text.includes("zero-day") || text.includes("patch")) {
+          recs.push("Accelerate client patching schedule and run network pen tests.");
+        } else if (text.includes("subprocessor") || text.includes("downstream")) {
+          recs.push("Audit and restrict downstream subprocessor data access routes.");
+        }
+      });
+    }
+    
+    if (recs.length === 0) {
+      if (vendor.riskLevel === "Critical" || vendor.riskLevel === "High") {
+        return "Schedule an immediate compliance review, limit database access permissions, and run vulnerability scans.";
+      }
+      return "Maintain routine automated certificate scans and bi-annual security policy checks.";
+    }
+    
+    return recs.slice(0, 2).join(" Furthermore, ");
   };
 
   return (
@@ -210,55 +243,67 @@ export default function Vendors({
       {/* Grid of vendors */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <AnimatePresence>
-          {filteredVendors.map((vendor) => {
-            // Scale score out of 10 as requested
-            const scoreOutOfTen = (vendor.riskScore / 10).toFixed(1);
-            
-            return (
-              <motion.div
-                layout
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                key={vendor.id}
-                onClick={() => setSelectedVendor(vendor)}
-                className={`glass-panel rounded-xl p-5 cursor-pointer relative overflow-hidden flex flex-col justify-between h-44 ${selectedVendor?.id === vendor.id ? "glass-panel-active" : ""}`}
-              >
-                <div className="radial-glow absolute inset-0"></div>
-                
-                <div className="flex justify-between items-start z-10">
-                  <div>
-                    <h3 className="font-display font-bold text-white text-base leading-tight hover:text-blue-400 transition-colors">
-                      {vendor.name}
-                    </h3>
-                    <span className="text-[9px] text-slate-500 font-medium">{vendor.industry}</span>
-                  </div>
-                  <span className={`px-2 py-0.5 rounded text-[9px] font-bold font-mono ${getRiskBadgeStyles(vendor.riskLevel)}`}>
-                    {scoreOutOfTen} / 10
-                  </span>
-                </div>
-
-                <p className="text-xs text-slate-400 line-clamp-2 my-2.5 z-10 font-light leading-relaxed">
-                  {vendor.description}
+          {filteredVendors.length === 0 ? (
+            <div className="col-span-full py-16 text-center glass-panel rounded-2xl flex flex-col items-center justify-center p-8 space-y-4">
+              <Shield className="w-10 h-10 text-slate-500 animate-pulse" />
+              <div>
+                <p className="text-sm font-semibold text-white">No Vendors Registered</p>
+                <p className="text-xs text-slate-500 mt-1 font-light max-w-sm mx-auto leading-relaxed">
+                  Enter new third-party entities using the registration portal or clear active matrix coordinates filters.
                 </p>
-
-                <div className="flex items-center justify-between border-t border-slate-800/40 pt-2.5 z-10">
-                  <div className="flex items-center gap-1.5 text-[9px] text-slate-400">
-                    <Shield className="w-3.5 h-3.5 text-blue-500" />
-                    <span>SOC2: {vendor.complianceStatus.SOC2 === "Compliant" ? "✅" : "❌"}</span>
-                    <span className="mx-1">•</span>
-                    <span>GDPR: {vendor.complianceStatus.GDPR === "Compliant" ? "✅" : "❌"}</span>
+              </div>
+            </div>
+          ) : (
+            filteredVendors.map((vendor) => {
+              // Scale score out of 10 as requested
+              const scoreOutOfTen = (vendor.riskScore / 10).toFixed(1);
+              
+              return (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  key={vendor.id}
+                  onClick={() => setSelectedVendor(vendor)}
+                  className={`glass-panel glow-card-hover rounded-xl p-5 cursor-pointer relative overflow-hidden flex flex-col justify-between h-44 ${selectedVendor?.id === vendor.id ? "glass-panel-active" : ""}`}
+                >
+                  <div className="radial-glow absolute inset-0"></div>
+                  
+                  <div className="flex justify-between items-start z-10">
+                    <div>
+                      <h3 className="font-display font-bold text-white text-base leading-tight hover:text-blue-400 transition-colors">
+                        {vendor.name}
+                      </h3>
+                      <span className="text-[9px] text-slate-500 font-medium">{vendor.industry}</span>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold font-mono ${getRiskBadgeStyles(vendor.riskLevel)}`}>
+                      {scoreOutOfTen} / 10
+                    </span>
                   </div>
-                  <button
-                    onClick={(e) => handleDeleteVendor(vendor.id, e)}
-                    className="p-1 rounded text-slate-600 hover:text-red-400 transition-colors"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </motion.div>
-            );
-          })}
+
+                  <p className="text-xs text-slate-400 line-clamp-2 my-2.5 z-10 font-light leading-relaxed">
+                    {vendor.description}
+                  </p>
+
+                  <div className="flex items-center justify-between border-t border-slate-800/40 pt-2.5 z-10">
+                    <div className="flex items-center gap-1.5 text-[9px] text-slate-400">
+                      <Shield className="w-3.5 h-3.5 text-blue-500" />
+                      <span>SOC2: {vendor.complianceStatus.SOC2 === "Compliant" ? "✅" : "❌"}</span>
+                      <span className="mx-1">•</span>
+                      <span>GDPR: {vendor.complianceStatus.GDPR === "Compliant" ? "✅" : "❌"}</span>
+                    </div>
+                    <button
+                      onClick={(e) => handleDeleteVendor(vendor.id, e)}
+                      className="p-1 rounded text-slate-600 hover:text-red-400 transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })
+          )}
         </AnimatePresence>
       </div>
 
@@ -375,16 +420,16 @@ export default function Vendors({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-slate-950 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl z-10 relative flex flex-col justify-between text-slate-300"
+              className="bg-slate-950 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl z-10 relative flex flex-col justify-between text-slate-300"
             >
               <div className="p-4 border-b border-slate-900 flex justify-between items-center bg-slate-950/40">
                 <h3 className="font-display font-bold text-white text-sm">Register Third-Party Vendor</h3>
-                <button onClick={() => setShowAddModal(false)}>
+                <button onClick={() => setShowAddModal(false)} className="cursor-pointer">
                   <X className="w-4 h-4 text-slate-400 hover:text-white" />
                 </button>
               </div>
 
-              <form onSubmit={handleAddVendorSubmit} className="p-5 space-y-4">
+              <form onSubmit={handleAddVendorSubmit} className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-1">Vendor Name *</label>
@@ -457,30 +502,77 @@ export default function Vendors({
                   </div>
                 </div>
 
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-1">Subprocessors Count</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={newVendor.subprocessors}
+                      onChange={(e) => setNewVendor({...newVendor, subprocessors: e.target.value})}
+                      placeholder="e.g. 5"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:border-blue-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-1">Security Risk Score (0-100) *</label>
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      max={100}
+                      value={newVendor.riskScore}
+                      onChange={(e) => setNewVendor({...newVendor, riskScore: e.target.value})}
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:border-blue-500/50"
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-1">Security Risk Score (0-100) *</label>
+                  <label className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-1">Data Assets Shared</label>
                   <input
-                    type="number"
-                    required
-                    min={0}
-                    max={100}
-                    value={newVendor.riskScore}
-                    onChange={(e) => setNewVendor({...newVendor, riskScore: e.target.value})}
+                    type="text"
+                    value={newVendor.dataAssetsShared}
+                    onChange={(e) => setNewVendor({...newVendor, dataAssetsShared: e.target.value})}
+                    placeholder="e.g. Customer PII, Financial Transaction Data"
                     className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:border-blue-500/50"
                   />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-1">Contact Name</label>
+                    <input
+                      type="text"
+                      value={newVendor.contactName}
+                      onChange={(e) => setNewVendor({...newVendor, contactName: e.target.value})}
+                      placeholder="e.g. Robert Smith"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:border-blue-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-1">Contact Email</label>
+                    <input
+                      type="email"
+                      value={newVendor.contactEmail}
+                      onChange={(e) => setNewVendor({...newVendor, contactEmail: e.target.value})}
+                      placeholder="e.g. rsmith@vendor.com"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:border-blue-500/50"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-3 border-t border-slate-900">
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-400 transition-colors"
+                    className="px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-400 transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-colors"
+                    className="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-colors cursor-pointer"
                   >
                     Register
                   </button>

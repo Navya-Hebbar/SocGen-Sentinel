@@ -161,3 +161,81 @@
   min-height: 100vh !important;
   display: block !important;
 }
+
+/* Custom premium HUD styling */
+.icon-glow-blue {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 70%);
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.4));
+}
+.icon-glow-red {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.25) 0%, transparent 70%);
+  filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.4));
+}
+.icon-glow-orange {
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.25) 0%, transparent 70%);
+  filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.4));
+}
+.icon-glow-emerald {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+  filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.4));
+}
+.icon-glow-yellow {
+  background: radial-gradient(circle, rgba(234, 179, 8, 0.25) 0%, transparent 70%);
+  filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4));
+}
+
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.text-gradient-emerald {
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.text-gradient-red {
+  background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Cyber Scanning Line Overlay */
+.cyber-scanner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.4), transparent);
+  animation: cyber-scan-anim 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes cyber-scan-anim {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(350px); opacity: 0; }
+}
+
+/* Recharts grid customization overrides */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: rgba(148, 163, 184, 0.05) !important;
+}
+
+.recharts-tooltip-cursor {
+  fill: rgba(59, 130, 246, 0.05) !important;
+}
+
+/* Custom premium card animations */
+.glow-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glow-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15), 0 0 12px 1px rgba(59, 130, 246, 0.08) !important;
+}
+
