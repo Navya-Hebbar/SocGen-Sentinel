@@ -12,10 +12,11 @@ import {
   ChevronRight,
   Database,
   Lock,
-  UserCheck
+  UserCheck,
+  LogOut
 } from "lucide-react";
 
-export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
+export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed, onSignOut }) {
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "vendors", label: "Vendors", icon: Users },
@@ -107,7 +108,16 @@ export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollaps
           })}
         </nav>
       </div>
-
+      {/* Sign Out Button */}
+      <div className="p-3 border-t border-slate-900/60 mt-auto">
+        <button
+          onClick={onSignOut}
+          className="w-full flex items-center gap-3 p-2.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group cursor-pointer"
+        >
+          <LogOut className="w-4 h-4 text-slate-500 group-hover:text-red-400 transition-colors" />
+          {!collapsed && <span className="uppercase tracking-wider">Sign Out</span>}
+        </button>
+      </div>
     </motion.div>
   );
 }

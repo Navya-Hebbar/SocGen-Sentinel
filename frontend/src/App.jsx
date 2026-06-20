@@ -9,11 +9,13 @@ import Vendors from "./pages/Vendors";
 import RiskAnalysis from "./pages/RiskAnalysis";
 import Compliance from "./pages/Compliance";
 import ContractAI from "./pages/ContractAI";
+import Welcome from "./pages/Welcome";
 
 export default function App() {
   // Navigation & Shell States
   const [activeTab, setActiveTab] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
+  const [showLanding, setShowLanding] = useState(true);
 
   // App Data States
   const [vendors, setVendors] = useState([]);
@@ -161,6 +163,23 @@ export default function App() {
     }
   };
 
+  if (showLanding) {
+    return (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key="welcome"
+          className="bg-slate-950"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Welcome onEnterPortal={() => setShowLanding(false)} />
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 flex font-sans selection:bg-blue-600/30 selection:text-white relative overflow-hidden">
       {/* Dynamic Background Image HUD Layer with smooth transition */}
@@ -181,6 +200,7 @@ export default function App() {
         setActiveTab={setActiveTab} 
         collapsed={collapsed}
         setCollapsed={setCollapsed}
+        onSignOut={() => setShowLanding(true)}
       />
 
       {/* Main Panel Shell */}
