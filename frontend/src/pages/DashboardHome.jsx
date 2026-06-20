@@ -9,15 +9,11 @@ import {
   Bar, 
   XAxis, 
   YAxis, 
-  Tooltip, 
-  Legend, 
-  CartesianGrid,
-  AreaChart,
-  Area
+  Tooltip,
+  CartesianGrid
 } from "recharts";
 import { 
   Users, 
-  AlertOctagon, 
   ShieldAlert, 
   Clock, 
   Activity, 
@@ -25,7 +21,8 @@ import {
   AlertTriangle,
   ArrowUpRight,
   TrendingUp,
-  FileCheck
+  FileCheck,
+  AlertOctagon
 } from "lucide-react";
 import { 
   getRiskDistributionData, 
@@ -41,7 +38,7 @@ export default function DashboardHome({
   setSelectedVendor,
   setHeatmapFilter
 }) {
-  // Statistics Calculations
+  // Statistics
   const totalVendors = vendors.length;
   const highRiskVendors = vendors.filter(v => v.riskLevel === "High" || v.riskLevel === "Critical").length;
   const expiredCertsCount = expiryAlerts.filter(a => a.status === "expired").length;
@@ -50,10 +47,9 @@ export default function DashboardHome({
   const riskDistribution = getRiskDistributionData(vendors);
   const complianceData = getComplianceStatusData(vendors);
 
-  // Sparkline data for stats cards
-  const sparklineData = [
-    { value: 10 }, { value: 15 }, { value: 12 }, { value: 18 }, { value: 14 }, { value: 22 }, { value: 25 }
-  ];
+  // Ecosystem health calculation
+  const averageRisk = Math.round(vendors.reduce((acc, curr) => acc + curr.riskScore, 0) / vendors.length) || 50;
+  const securityIndex = 100 - averageRisk;
 
   const handleHeatmapCellClick = (vendorsList) => {
     if (vendorsList && vendorsList.length > 0) {
@@ -62,419 +58,267 @@ export default function DashboardHome({
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
   return (
     <motion.div 
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      className="p-6 space-y-6"
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="p-6 space-y-6 select-none"
     >
-      {/* Top Banner Warning if breached vendors exist */}
-      {breachedVendorsCount > 0 && (
-        <motion.div 
-          variants={itemVariants}
-          className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-center justify-between shadow-[0_0_15px_rgba(239,68,68,0.05)]"
-        >
-          <div className="flex items-center gap-3">
-            <span className="flex h-3 w-3 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-            </span>
-            <div>
-              <p className="text-sm font-semibold text-white font-display">Active Breaches Detected</p>
-              <p className="text-xs text-slate-400 mt-0.5">
-                {breachedVendorsCount} vendor{breachedVendorsCount > 1 ? "s are" : " is"} currently flagged with unresolved cybersecurity breaches. Actions required.
-              </p>
-            </div>
-          </div>
-          <button 
-            onClick={() => setActiveTab("vendors")}
-            className="px-3 py-1 bg-red-500/20 hover:bg-red-500/35 border border-red-500/30 text-red-300 rounded-lg text-xs font-semibold transition-colors"
-          >
-            Review Incidents
-          </button>
-        </motion.div>
-      )}
+      {/* Visual Header Banner */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl glass-panel relative overflow-hidden">
+        <div className="radial-glow absolute inset-0"></div>
+        <div className="z-10 space-y-1">
+          <span className="text-[10px] bg-blue-500/15 border border-blue-500/30 text-blue-400 px-2 py-0.5 rounded font-mono uppercase tracking-widest">SecOps Control Portal</span>
+          <h2 className="text-xl font-bold font-display text-white mt-1.5">SocGen Sentinel Security Center</h2>
+          <p className="text-xs text-slate-400 font-light">AI-Powered Third-Party Vendor Risk Intelligence Platform</p>
+        </div>
+        <div className="z-10 flex items-center gap-3">
+          <span className="flex h-2.5 w-2.5 relative">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span className="text-xs text-emerald-400 font-semibold tracking-wider uppercase font-mono">Ecosystem Shield Active</span>
+        </div>
+      </div>
 
-      {/* Grid: 4 Stats Cards */}
-      <motion.div 
-        variants={containerVariants}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5"
-      >
-        {/* Card 1: Total Vendors */}
-        <motion.div variants={itemVariants} className="glass-panel rounded-xl p-5 relative overflow-hidden flex flex-col justify-between h-36">
-          <div className="radial-glow absolute inset-0"></div>
-          <div className="flex justify-between items-start z-10">
-            <div>
-              <span className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total Vendors</span>
-              <h3 className="text-3xl font-bold font-display text-white mt-1">{totalVendors}</h3>
+      {/* Grid: Stats Overview Cards (Compact & Minimalist) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: "Total Vendors", value: totalVendors, icon: Users, color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
+          { label: "High Risk Focus", value: highRiskVendors, icon: AlertTriangle, color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/20" },
+          { label: "Expired Certifications", value: expiredCertsCount, icon: Clock, color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" },
+          { label: "Active Breaches", value: breachedVendorsCount, icon: ShieldAlert, color: breachedVendorsCount > 0 ? "text-red-400 pulse-red" : "text-slate-400", bg: breachedVendorsCount > 0 ? "bg-red-500/10 border-red-500/30" : "bg-slate-900 border-slate-800" }
+        ].map((stat, i) => {
+          const Icon = stat.icon;
+          return (
+            <div key={i} className="glass-panel rounded-xl p-4 flex items-center justify-between relative overflow-hidden h-20">
+              <div className="radial-glow absolute inset-0"></div>
+              <div className="z-10">
+                <span className="text-[10px] text-slate-500 uppercase tracking-widest block font-medium">{stat.label}</span>
+                <span className="text-2xl font-bold font-display text-white mt-1 block">{stat.value}</span>
+              </div>
+              <div className={`p-2 rounded-lg border z-10 ${stat.bg} ${stat.color}`}>
+                <Icon className="w-4 h-4" />
+              </div>
             </div>
-            <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400">
-              <Users className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="flex items-center justify-between text-xs mt-4 z-10">
-            <span className="text-emerald-400 font-semibold flex items-center gap-1">
-              <TrendingUp className="w-3.5 h-3.5" /> +12% MoM
-            </span>
-            <span className="text-slate-500 font-light">Ecosystem active</span>
-          </div>
-        </motion.div>
+          );
+        })}
+      </div>
 
-        {/* Card 2: High Risk Vendors */}
-        <motion.div variants={itemVariants} className="glass-panel rounded-xl p-5 relative overflow-hidden flex flex-col justify-between h-36 border-orange-500/20">
-          <div className="radial-glow absolute inset-0"></div>
-          <div className="flex justify-between items-start z-10">
-            <div>
-              <span className="text-slate-500 text-xs font-semibold uppercase tracking-wider">High Risk Vendors</span>
-              <h3 className="text-3xl font-bold font-display text-orange-400 mt-1">{highRiskVendors}</h3>
-            </div>
-            <div className="p-2.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="flex items-center justify-between text-xs mt-4 z-10">
-            <span className="text-slate-400 font-light">Score &gt; 70 threshold</span>
-            <span className="text-orange-400 font-medium">Critical focus</span>
-          </div>
-        </motion.div>
-
-        {/* Card 3: Expired Certifications */}
-        <motion.div variants={itemVariants} className="glass-panel rounded-xl p-5 relative overflow-hidden flex flex-col justify-between h-36 border-yellow-500/20">
-          <div className="radial-glow absolute inset-0"></div>
-          <div className="flex justify-between items-start z-10">
-            <div>
-              <span className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Expired Certs</span>
-              <h3 className="text-3xl font-bold font-display text-yellow-400 mt-1">{expiredCertsCount}</h3>
-            </div>
-            <div className="p-2.5 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-400">
-              <Clock className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="flex items-center justify-between text-xs mt-4 z-10">
-            <span className="text-red-400 font-semibold">{expiredCertsCount} urgent renewals</span>
-            <span className="text-slate-500 font-light">SOC2, ISO, GDPR</span>
-          </div>
-        </motion.div>
-
-        {/* Card 4: Breached Vendors */}
-        <motion.div variants={itemVariants} className={`glass-panel rounded-xl p-5 relative overflow-hidden flex flex-col justify-between h-36 ${breachedVendorsCount > 0 ? "border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.1)]" : "border-slate-800"}`}>
-          <div className="radial-glow absolute inset-0"></div>
-          <div className="flex justify-between items-start z-10">
-            <div>
-              <span className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Breached Vendors</span>
-              <h3 className={`text-3xl font-bold font-display mt-1 ${breachedVendorsCount > 0 ? "text-red-400" : "text-white"}`}>
-                {breachedVendorsCount}
-              </h3>
-            </div>
-            <div className={`p-2.5 rounded-lg border ${breachedVendorsCount > 0 ? "bg-red-500/20 border-red-500/30 text-red-400 pulse-red" : "bg-slate-900 border-slate-800 text-slate-400"}`}>
-              <ShieldAlert className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="flex items-center justify-between text-xs mt-4 z-10">
-            <span className={breachedVendorsCount > 0 ? "text-red-400 font-semibold" : "text-emerald-400"}>
-              {breachedVendorsCount > 0 ? "Incident Response Active" : "No active breaches"}
-            </span>
-            <span className="text-slate-500 font-light">Dark Web monitoring</span>
-          </div>
-        </motion.div>
-      </motion.div>
-
-      {/* Grid: Charts Section */}
+      {/* Grid: 3 Visual Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Risk Distribution Pie Chart */}
-        <motion.div variants={itemVariants} className="glass-panel rounded-xl p-5 lg:col-span-1 flex flex-col justify-between min-h-[380px]">
-          <div>
-            <h4 className="font-display font-semibold text-sm text-white flex items-center gap-2">
-              <Activity className="w-4 h-4 text-blue-500" /> Risk Level Distribution
-            </h4>
-            <p className="text-xs text-slate-500 mt-0.5">Ecosystem breakdown of vendor risk segments</p>
+        
+        {/* Left Column: Security Shield circular Index (Minimalist WOW factor) */}
+        <div className="glass-panel rounded-xl p-5 flex flex-col justify-between items-center min-h-[300px]">
+          <div className="w-full">
+            <h4 className="font-display font-semibold text-xs text-white uppercase tracking-wider">Ecosystem Shield Index</h4>
+            <p className="text-[10px] text-slate-500">Aggregate security score across all vendors</p>
           </div>
-          <div className="h-60 w-full relative flex items-center justify-center">
+          
+          <div className="relative flex items-center justify-center my-4">
+            {/* SVG Ring Dial */}
+            <svg className="w-36 h-36 transform -rotate-90">
+              <circle cx="72" cy="72" r="60" stroke="rgba(15, 23, 42, 0.7)" strokeWidth="8" fill="transparent" />
+              <circle 
+                cx="72" 
+                cy="72" 
+                r="60" 
+                stroke={securityIndex > 70 ? "#34d399" : "#fb923c"} 
+                strokeWidth="8" 
+                fill="transparent" 
+                strokeDasharray={376.8}
+                strokeDashoffset={376.8 - (376.8 * securityIndex) / 100}
+                className="transition-all duration-1000 ease-out"
+                strokeLinecap="round"
+              />
+            </svg>
+            <div className="absolute text-center">
+              <span className="text-3xl font-extrabold font-display text-white">{securityIndex}%</span>
+              <span className="text-[9px] text-slate-400 uppercase tracking-widest block mt-0.5">Secure State</span>
+            </div>
+          </div>
+
+          <div className="text-[10px] text-slate-400 flex items-center gap-1.5 bg-slate-900/50 border border-slate-800/80 px-3 py-1 rounded-full">
+            <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Operational risk remains at <span className="font-semibold text-white">{averageRisk}%</span></span>
+          </div>
+        </div>
+
+        {/* Center Column: Risk Pie distribution (Clean and precise) */}
+        <div className="glass-panel rounded-xl p-5 flex flex-col justify-between min-h-[300px]">
+          <div>
+            <h4 className="font-display font-semibold text-xs text-white uppercase tracking-wider">Risk Level breakdown</h4>
+            <p className="text-[10px] text-slate-500">Distribution segments across catalog</p>
+          </div>
+          <div className="h-44 w-full relative flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={riskDistribution}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={85}
-                  paddingAngle={5}
+                  innerRadius={50}
+                  outerRadius={68}
+                  paddingAngle={4}
                   dataKey="value"
                 >
                   {riskDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155" }}
-                  itemStyle={{ color: "#f1f5f9" }}
-                />
               </PieChart>
             </ResponsiveContainer>
-            {/* Center Text */}
-            <div className="absolute text-center">
-              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold block">Average Score</span>
-              <span className="text-3xl font-bold font-display text-white">58</span>
-              <span className="text-[10px] text-slate-400 block font-medium">Medium Risk</span>
+            <div className="absolute text-center mt-[-2px]">
+              <span className="text-xl font-bold font-display text-white">{vendors.length}</span>
+              <span className="text-[8px] text-slate-500 uppercase tracking-widest block">Vendors</span>
             </div>
           </div>
-          <div className="grid grid-cols-4 gap-2 text-center text-xs mt-2">
+          <div className="flex justify-around text-[10px] text-slate-400 border-t border-slate-900/60 pt-2.5">
             {riskDistribution.map((d, i) => (
-              <div key={i} className="flex flex-col items-center">
-                <span className="w-2.5 h-2.5 rounded-full mb-1" style={{ backgroundColor: d.color }}></span>
-                <span className="text-slate-400 font-medium">{d.name}</span>
-                <span className="text-white font-semibold mt-0.5">{d.value}</span>
+              <div key={i} className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: d.color }}></span>
+                <span>{d.name}: <strong className="text-white">{d.value}</strong></span>
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Compliance Status Chart */}
-        <motion.div variants={itemVariants} className="glass-panel rounded-xl p-5 lg:col-span-2 flex flex-col justify-between min-h-[380px]">
+        {/* Right Column: Compliance Audits status bar chart (Focused) */}
+        <div className="glass-panel rounded-xl p-5 flex flex-col justify-between min-h-[300px]">
           <div>
-            <h4 className="font-display font-semibold text-sm text-white flex items-center gap-2">
-              <FileCheck className="w-4 h-4 text-blue-500" /> Compliance Framework Audits
-            </h4>
-            <p className="text-xs text-slate-500 mt-0.5">Compliant vs Non-Compliant/Partial statuses across core standards</p>
+            <h4 className="font-display font-semibold text-xs text-white uppercase tracking-wider">Compliance Matrix Audits</h4>
+            <p className="text-[10px] text-slate-500">Total vendors matching policy standard checklists</p>
           </div>
-          <div className="h-64 w-full mt-4">
+          <div className="h-44 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={complianceData}
-                margin={{ top: 20, right: 10, left: -20, bottom: 0 }}
+                margin={{ top: 10, right: 0, left: -24, bottom: 0 }}
+                barSize={12}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(51, 65, 85, 0.15)" />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155" }} />
-                <Legend 
-                  verticalAlign="top" 
-                  height={36} 
-                  iconSize={8}
-                  wrapperStyle={{ fontSize: 11, color: "#94a3b8" }}
-                />
-                <Bar name="Compliant" dataKey="compliant" fill="#34d399" radius={[4, 4, 0, 0]} />
-                <Bar name="Partial / Non-Compliant" dataKey="partial" fill="#fb923c" radius={[4, 4, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(51, 65, 85, 0.1)" />
+                <XAxis dataKey="name" stroke="#94a3b8" fontSize={9} tickLine={false} />
+                <YAxis stroke="#94a3b8" fontSize={9} tickLine={false} />
+                <Bar name="Compliant" dataKey="compliant" fill="#34d399" radius={[3, 3, 0, 0]} />
+                <Bar name="Partial / Non-Compliant" dataKey="partial" fill="#fb923c" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="text-[11px] text-slate-500 flex items-center justify-between border-t border-slate-900/60 pt-3">
-            <span>Scan cycle: Every 24 hours</span>
+          <div className="text-[9px] text-slate-500 flex justify-between border-t border-slate-900/60 pt-2.5">
+            <span>Updated hourly</span>
             <button 
               onClick={() => setActiveTab("compliance")}
-              className="text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 hover:underline"
+              className="text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-0.5"
             >
-              Auditing dashboard <ChevronRight className="w-3.5 h-3.5" />
+              Audits tracker <ChevronRight className="w-3 h-3" />
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
 
-      {/* Grid: Expiry, Heatmap, Timeline */}
+      {/* Grid: Table & Heatmap Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Heatmap Grid */}
-        <motion.div variants={itemVariants} className="glass-panel rounded-xl p-5 flex flex-col justify-between min-h-[380px]">
-          <div>
-            <h4 className="font-display font-semibold text-sm text-white">Risk Matrix (Likelihood vs Impact)</h4>
-            <p className="text-xs text-slate-500 mt-0.5">Click cells to filter vendors in risk list</p>
+        
+        {/* Left Side: High Risk Vendors Roster (2/3 Column) */}
+        <div className="glass-panel rounded-xl p-5 lg:col-span-2 space-y-4">
+          <div className="flex justify-between items-center pb-2 border-b border-slate-900/60">
+            <div>
+              <h4 className="font-display font-semibold text-xs text-white uppercase tracking-wider">Security Roster (High Exposure Target Lists)</h4>
+              <p className="text-[10px] text-slate-500">Third-party threats requiring review</p>
+            </div>
+            <button 
+              onClick={() => setActiveTab("vendors")}
+              className="text-[10px] text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-0.5"
+            >
+              All Vendors <ArrowUpRight className="w-3.5 h-3.5" />
+            </button>
           </div>
-          <div className="grid grid-cols-3 gap-3 my-4 flex-grow justify-center items-center">
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-slate-900 text-slate-500 font-semibold uppercase tracking-widest text-[9px]">
+                  <th className="pb-2.5 pl-1">Vendor Name</th>
+                  <th className="pb-2.5 text-center">Score</th>
+                  <th className="pb-2.5">Risk Level</th>
+                  <th className="pb-2.5">Primary Threat Vector</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-900/60">
+                {vendors
+                  .filter(v => v.riskLevel === "High" || v.riskLevel === "Critical")
+                  .slice(0, 3)
+                  .map((vendor) => (
+                    <tr 
+                      key={vendor.id} 
+                      className="hover:bg-slate-900/30 transition-colors group cursor-pointer"
+                      onClick={() => {
+                        setSelectedVendor(vendor);
+                        setActiveTab("vendors");
+                      }}
+                    >
+                      <td className="py-2.5 font-semibold text-white pl-1 group-hover:text-blue-400 transition-colors">
+                        {vendor.name}
+                      </td>
+                      <td className="py-2.5 text-center">
+                        <span className="font-mono font-bold text-red-400">
+                          {vendor.riskScore}
+                        </span>
+                      </td>
+                      <td className="py-2.5">
+                        <span className={`inline-flex items-center gap-1 font-semibold ${
+                          vendor.riskLevel === "Critical" ? "text-red-400" : "text-orange-400"
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            vendor.riskLevel === "Critical" ? "bg-red-500 animate-pulse" : "bg-orange-500"
+                          }`}></span>
+                          {vendor.riskLevel}
+                        </span>
+                      </td>
+                      <td className="py-2.5 text-slate-400 truncate max-w-xs font-light">
+                        {vendor.riskFactors[0]}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Right Side: Quick Risk Matrix Grid (1/3 Column) */}
+        <div className="glass-panel rounded-xl p-5 flex flex-col justify-between min-h-[220px]">
+          <div>
+            <h4 className="font-display font-semibold text-xs text-white uppercase tracking-wider">Likelihood vs Impact Matrix</h4>
+            <p className="text-[10px] text-slate-500">Quick-filter vendors by threat grid coordinate</p>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-2.5 my-3 flex-grow items-center justify-center">
             {mockRiskHeatmap.map((cell, idx) => {
               const bg = 
-                cell.likelihood === "High" && cell.impact === "High" ? "bg-red-500/10 border-red-500/40 text-red-400 hover:bg-red-500/20" :
-                cell.likelihood === "High" && cell.impact === "Medium" ? "bg-orange-500/10 border-orange-500/40 text-orange-400 hover:bg-orange-500/20" :
-                cell.likelihood === "Medium" && cell.impact === "High" ? "bg-orange-500/10 border-orange-500/40 text-orange-400 hover:bg-orange-500/20" :
-                cell.likelihood === "Medium" && cell.impact === "Medium" ? "bg-yellow-500/10 border-yellow-500/40 text-yellow-400 hover:bg-yellow-500/20" :
-                "bg-emerald-500/10 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/20";
+                cell.likelihood === "High" && cell.impact === "High" ? "bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20" :
+                cell.likelihood === "High" && cell.impact === "Medium" ? "bg-orange-500/10 border-orange-500/30 text-orange-400 hover:bg-orange-500/20" :
+                cell.likelihood === "Medium" && cell.impact === "High" ? "bg-orange-500/10 border-orange-500/30 text-orange-400 hover:bg-orange-500/20" :
+                cell.likelihood === "Medium" && cell.impact === "Medium" ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20" :
+                "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20";
                 
               return (
                 <button
                   key={idx}
                   onClick={() => handleHeatmapCellClick(cell.vendors)}
-                  className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center transition-all ${bg} cursor-pointer group`}
+                  className={`p-2 rounded-lg border text-center flex flex-col items-center justify-center transition-all ${bg} cursor-pointer group`}
                 >
-                  <span className="text-lg font-bold group-hover:scale-110 transition-transform">{cell.count}</span>
-                  <span className="text-[9px] font-semibold uppercase tracking-wider mt-1 opacity-80 truncate max-w-full">
-                    L:{cell.likelihood} / I:{cell.impact}
+                  <span className="text-base font-bold group-hover:scale-110 transition-transform">{cell.count}</span>
+                  <span className="text-[8px] font-semibold uppercase mt-0.5 opacity-85 truncate max-w-full">
+                    {cell.likelihood[0]}L/{cell.impact[0]}I
                   </span>
                 </button>
               );
             })}
           </div>
-          <div className="text-[10px] text-slate-500 text-center leading-relaxed">
-            Matrix mapped via AI security controls & historical incidents score.
-          </div>
-        </motion.div>
+        </div>
 
-        {/* Expiry Alerts Feed */}
-        <motion.div variants={itemVariants} className="glass-panel rounded-xl p-5 flex flex-col justify-between min-h-[380px]">
-          <div>
-            <h4 className="font-display font-semibold text-sm text-white">Compliance Expirations</h4>
-            <p className="text-xs text-slate-500 mt-0.5">Critical certification deadlines requiring action</p>
-          </div>
-          <div className="space-y-3.5 my-4 overflow-y-auto max-h-60 pr-1 flex-grow">
-            {expiryAlerts.map((alert) => (
-              <div 
-                key={alert.id}
-                className={`p-3 rounded-lg border flex items-center justify-between text-xs ${
-                  alert.status === "expired" 
-                    ? "bg-red-500/5 border-red-500/10 text-red-300" 
-                    : alert.status === "critical"
-                    ? "bg-orange-500/5 border-orange-500/10 text-orange-300"
-                    : "bg-yellow-500/5 border-yellow-500/10 text-yellow-300"
-                }`}
-              >
-                <div>
-                  <p className="font-semibold text-slate-200">{alert.vendorName}</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">{alert.certName}</p>
-                </div>
-                <div className="text-right">
-                  <span className={`inline-block px-2 py-0.5 rounded font-semibold text-[9px] uppercase ${
-                    alert.status === "expired" ? "bg-red-500/20 text-red-400" : "bg-orange-500/20 text-orange-400"
-                  }`}>
-                    {alert.expiryDays < 0 ? "Expired" : `In ${alert.expiryDays} Days`}
-                  </span>
-                  <p className="text-[10px] text-slate-500 mt-1">{alert.expiryDate}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <button 
-            onClick={() => setActiveTab("compliance")}
-            className="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-300 rounded-lg transition-colors text-center"
-          >
-            Manage Audit Documents
-          </button>
-        </motion.div>
-
-        {/* Timeline Activities Feed */}
-        <motion.div variants={itemVariants} className="glass-panel rounded-xl p-5 flex flex-col justify-between min-h-[380px]">
-          <div>
-            <h4 className="font-display font-semibold text-sm text-white">Threat Stream / Activity Log</h4>
-            <p className="text-xs text-slate-500 mt-0.5">Real-time alerts and platform changes</p>
-          </div>
-          <div className="relative border-l border-slate-800 pl-4 space-y-4 my-4 overflow-y-auto max-h-60 pr-1 flex-grow">
-            {recentActivities.map((act) => {
-              const pulseColor = 
-                act.type === "critical" ? "bg-red-400" :
-                act.type === "warning" ? "bg-orange-400" :
-                act.type === "success" ? "bg-emerald-400" : "bg-blue-400";
-              return (
-                <div key={act.id} className="relative text-xs">
-                  {/* Timeline point */}
-                  <span className={`absolute -left-[21px] top-1.5 rounded-full w-2 h-2 ${pulseColor}`}></span>
-                  <div className="flex justify-between items-start gap-4">
-                    <span className="font-semibold text-slate-200 hover:text-blue-400 cursor-pointer" onClick={() => {
-                      const vend = vendors.find(v => v.id === act.vendorId);
-                      if (vend) {
-                        setSelectedVendor(vend);
-                        setActiveTab("vendors");
-                      }
-                    }}>
-                      {act.vendorName}
-                    </span>
-                    <span className="text-[10px] text-slate-500 whitespace-nowrap">{act.timestamp}</span>
-                  </div>
-                  <p className="text-slate-400 mt-0.5 leading-relaxed font-light">{act.content}</p>
-                </div>
-              );
-            })}
-          </div>
-          <div className="text-[10px] text-slate-600 text-center uppercase tracking-widest font-semibold flex items-center justify-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live Intelligence Feed Active
-          </div>
-        </motion.div>
       </div>
-
-      {/* High Risk Vendors Table */}
-      <motion.div variants={itemVariants} className="glass-panel rounded-xl p-5">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h4 className="font-display font-semibold text-sm text-white">Vendor Security Roster (Focus Targets)</h4>
-            <p className="text-xs text-slate-500 mt-0.5">Top exposure risks across active third parties</p>
-          </div>
-          <button 
-            onClick={() => setActiveTab("vendors")}
-            className="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 hover:underline"
-          >
-            All Vendors ({totalVendors}) <ArrowUpRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-slate-900 text-slate-500 font-semibold uppercase tracking-wider">
-                <th className="pb-3 pl-2">Vendor Name</th>
-                <th className="pb-3">Industry</th>
-                <th className="pb-3 text-center">Risk Score</th>
-                <th className="pb-3">Risk Level</th>
-                <th className="pb-3">Risk Factors</th>
-                <th className="pb-3 text-right pr-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-900/60">
-              {vendors
-                .filter(v => v.riskLevel === "High" || v.riskLevel === "Critical")
-                .map((vendor) => (
-                  <tr 
-                    key={vendor.id} 
-                    className="hover:bg-slate-900/40 transition-colors group cursor-pointer"
-                    onClick={() => {
-                      setSelectedVendor(vendor);
-                      setActiveTab("vendors");
-                    }}
-                  >
-                    <td className="py-3.5 font-semibold text-white pl-2 group-hover:text-blue-400 transition-colors">
-                      {vendor.name}
-                    </td>
-                    <td className="py-3.5 text-slate-400">{vendor.industry}</td>
-                    <td className="py-3.5 text-center">
-                      <span className={`font-mono font-bold px-2 py-0.5 rounded text-[11px] ${
-                        vendor.riskLevel === "Critical" ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-orange-500/10 text-orange-400 border border-orange-500/20"
-                      }`}>
-                        {vendor.riskScore} / 100
-                      </span>
-                    </td>
-                    <td className="py-3.5">
-                      <span className={`inline-flex items-center gap-1 font-semibold ${
-                        vendor.riskLevel === "Critical" ? "text-red-400" : "text-orange-400"
-                      }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${
-                          vendor.riskLevel === "Critical" ? "bg-red-500 animate-pulse" : "bg-orange-500"
-                        }`}></span>
-                        {vendor.riskLevel}
-                      </span>
-                    </td>
-                    <td className="py-3.5 text-slate-400 max-w-xs truncate">
-                      {vendor.riskFactors[0]} {vendor.riskFactors.length > 1 && `+${vendor.riskFactors.length - 1} more`}
-                    </td>
-                    <td className="py-3.5 text-right pr-2">
-                      <button className="px-2.5 py-1 bg-slate-900 hover:bg-blue-600 border border-slate-800 hover:border-blue-500 hover:text-white text-[11px] font-semibold text-slate-300 rounded transition-all">
-                        Assess
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-      </motion.div>
     </motion.div>
   );
 }
