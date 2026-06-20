@@ -22,16 +22,16 @@ export default function Welcome({ onEnterPortal }) {
     let height = canvas.height = window.innerHeight;
 
     const particles = [];
-    const particleCount = 60; 
-    const connectionDistance = 125;
-    const mouse = { x: null, y: null, radius: 150 };
+    const particleCount = 50; 
+    const connectionDistance = 150;
+    const mouse = { x: null, y: null, radius: 200 };
 
     class Particle {
       constructor() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.25;
-        this.vy = (Math.random() - 0.5) * 0.25;
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
         this.radius = Math.random() * 1.5 + 0.5;
       }
 
@@ -48,8 +48,8 @@ export default function Welcome({ onEnterPortal }) {
           const distance = Math.sqrt(dx * dx + dy * dy);
           if (distance < mouse.radius) {
             const force = (mouse.radius - distance) / mouse.radius;
-            this.x -= dx * force * 0.01;
-            this.y -= dy * force * 0.01;
+            this.x -= dx * force * 0.015;
+            this.y -= dy * force * 0.015;
           }
         }
       }
@@ -57,7 +57,7 @@ export default function Welcome({ onEnterPortal }) {
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(59, 130, 246, 0.3)";
+        ctx.fillStyle = "rgba(34, 211, 238, 0.4)";
         ctx.fill();
       }
     }
@@ -79,12 +79,12 @@ export default function Welcome({ onEnterPortal }) {
           const distance = Math.sqrt(dx * dx + dy * dy);
 
           if (distance < connectionDistance) {
-            const alpha = (1 - distance / connectionDistance) * 0.12;
+            const alpha = (1 - distance / connectionDistance) * 0.15;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(34, 211, 238, ${alpha})`;
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
+            ctx.lineWidth = 1;
             ctx.stroke();
           }
         }
@@ -156,137 +156,156 @@ export default function Welcome({ onEnterPortal }) {
       title: "COMPLIANCE RADAR",
       desc: "Ensure continuous alignment. Track SOC2, ISO27001, and GDPR controls dynamically with automated warning tasks.",
       icon: FileCheck,
-      iconColor: "text-emerald-400",
-      iconGlow: "bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+      iconColor: "text-blue-400",
+      iconGlow: "bg-blue-500/10 border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
     }
   ];
 
   return (
-    <div className="h-screen w-screen bg-slate-950 flex flex-col justify-between p-4 md:p-6 relative overflow-hidden select-none text-slate-200">
+    <div className="h-screen w-screen bg-slate-950 flex flex-col relative overflow-hidden select-none text-slate-200">
       
-      {/* Background Tech Loop Video */}
+      {/* Background Tech Loop Video - HIGH VISIBILITY */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-15 pointer-events-none"
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-screen pointer-events-none"
       >
         <source src="/cyber_bg.mp4" type="video/mp4" />
       </video>
 
-      {/* Cyber Grid & Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-950/80 to-slate-950 pointer-events-none z-0"></div>
-      <div className="absolute inset-0 radial-glow pointer-events-none z-0"></div>
-      <div className="absolute inset-0 cyber-grid opacity-10 pointer-events-none z-0"></div>
+      {/* Massive Glowing Orbs for stunning backdrop */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/20 rounded-full blur-[150px] pointer-events-none z-0"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
+
+      {/* Cyber Grid Overlay */}
+      <div className="absolute inset-0 cyber-grid opacity-20 pointer-events-none z-0 mix-blend-overlay"></div>
 
       {/* Interactive HTML5 Canvas Plexus Animation */}
       <canvas 
         ref={canvasRef} 
-        className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-50" 
+        className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-80 mix-blend-screen" 
       />
 
       {/* Top Navbar */}
-      <header className="w-full flex items-center justify-between z-10 py-1.5 border-b border-slate-900/40 bg-slate-950/20 backdrop-blur-sm">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center">
-            <Shield className="w-4 h-4 text-blue-400 filter drop-shadow(0 0 2px rgba(59, 130, 246, 0.4))" />
+      <header className="flex-none w-full flex items-center justify-between z-10 py-3 px-6 md:px-10 border-b border-slate-900/60 bg-slate-950/40 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center">
+            <Shield className="w-4 h-4 text-blue-400 filter drop-shadow(0 0 4px rgba(59, 130, 246, 0.6))" />
           </div>
-          <span className="font-display font-bold text-xs tracking-wider uppercase text-white">
+          <span className="font-display font-bold text-sm tracking-widest uppercase text-white">
             SocGen <span className="text-blue-400">Sentinel</span>
           </span>
         </div>
         <div>
           <button 
             onClick={onEnterPortal}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-blue-500/20 text-blue-400 hover:text-white hover:border-blue-400 hover:shadow-[0_0_12px_rgba(59,130,246,0.15)] text-[9px] font-bold tracking-widest uppercase transition-all duration-300 cursor-pointer bg-slate-950/40"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-blue-500/30 text-blue-400 hover:text-white hover:bg-blue-500/10 hover:border-blue-400 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] text-[10px] font-bold tracking-widest uppercase transition-all duration-300 cursor-pointer bg-slate-950/60"
           >
             Portal Access
           </button>
         </div>
       </header>
 
-      {/* Hero & Title Center Area */}
-      <main className="flex-grow z-10 flex flex-col justify-center items-center text-center max-w-5xl mx-auto py-2 space-y-4">
+      {/* Main Container - Strictly flexed to prevent scrolling */}
+      <main className="flex-1 z-10 flex flex-col justify-between w-full max-w-7xl mx-auto px-6 py-6 h-full">
         
-        {/* Status indicator pill */}
-        <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[9px] font-semibold tracking-widest uppercase font-mono shadow-[0_0_10px_rgba(59,130,246,0.05)]">
-          <span className="w-1 h-1 rounded-full bg-blue-400 animate-ping"></span>
-          SecOps Shield v2.5
-        </div>
-
-        {/* Big Premium Header */}
-        <div className="space-y-1">
-          <h1 className="text-4xl md:text-6xl font-display font-extrabold tracking-tight text-white leading-none uppercase">
-            SOCGEN SENTINEL
-          </h1>
-          <p className="text-gradient-cyan text-xs md:text-sm font-semibold tracking-wider uppercase font-mono">
-            AI-Powered Third-Party Risk Intelligence
-          </p>
-        </div>
-
-        {/* Description */}
-        <p className="text-slate-400 text-xs md:text-sm max-w-xl font-light leading-relaxed">
-          Establishing continuous compliance auditing, What-If threat mitigation simulation modeling, and NLP service agreement parsing.
-        </p>
-
-        {/* Launch Portal button */}
-        <div className="pt-1">
-          <button
-            onClick={onEnterPortal}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold tracking-widest uppercase transition-all duration-300 transform hover:scale-[1.02] cursor-pointer shadow-[0_4px_15px_rgba(59,130,246,0.25)]"
+        {/* Top Half: Massive Hero Area */}
+        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-5">
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="space-y-6"
           >
-            Launch Control Portal <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
+            {/* Status Pill */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/40 text-blue-400 text-[10px] font-bold tracking-widest uppercase font-mono shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+              System Online // SecOps v2.5
+            </div>
 
-        {/* Dynamic Features Title - Styled exactly like the User Reference image */}
-        <div className="pt-4 space-y-0.5">
-          <span className="text-[9px] text-cyan-400 font-bold uppercase tracking-widest block font-mono">
-            FEATURES
-          </span>
-          <h2 className="text-lg md:text-xl font-extrabold text-white tracking-tight uppercase">
-            WHY IS IT USEFUL?
-          </h2>
-        </div>
-
-        {/* 4 Feature Cards Row - Styled exactly like User Reference glassmorphism with glossy sheen */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full pt-1">
-          {features.map((feat, idx) => {
-            const Icon = feat.icon;
-            return (
-              <div 
-                key={idx}
-                onClick={onEnterPortal}
-                className="glass-glossy p-4 flex flex-col justify-start text-left h-44 cursor-pointer group"
+            {/* Massive Glowing Title */}
+            <div className="space-y-2">
+              <h1 
+                className="text-6xl md:text-8xl lg:text-[7rem] font-display font-extrabold tracking-tighter text-white leading-none uppercase"
+                style={{ textShadow: "0 0 40px rgba(34, 211, 238, 0.3), 0 0 80px rgba(59, 130, 246, 0.2)" }}
               >
-                {/* Circular Icon with light glow */}
-                <div className="mb-4">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${feat.iconGlow}`}>
-                    <Icon className={`w-4 h-4 ${feat.iconColor}`} />
+                SOCGEN SENTINEL
+              </h1>
+              <p className="text-gradient-cyan text-sm md:text-base font-bold tracking-[0.25em] uppercase font-mono mt-4 drop-shadow-md">
+                AI-Powered Third-Party Risk Intelligence
+              </p>
+            </div>
+
+            {/* Description */}
+            <p className="text-slate-300 text-xs md:text-sm max-w-2xl mx-auto font-light leading-relaxed drop-shadow-sm">
+              Establishing continuous compliance auditing, predictive threat mitigation modeling, and NLP service agreement parsing to secure downstream corporate dependencies.
+            </p>
+
+            {/* Launch Portal Button */}
+            <div className="pt-4">
+              <button
+                onClick={onEnterPortal}
+                className="group relative inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold tracking-widest uppercase transition-all duration-300 transform hover:scale-[1.03] cursor-pointer shadow-[0_0_30px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.6)] overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/30 to-cyan-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
+                <span className="relative">Launch Control Portal</span>
+                <ArrowRight className="w-4 h-4 relative transition-transform group-hover:translate-x-1" />
+              </button>
+            </div>
+          </motion.div>
+          
+        </div>
+
+        {/* Bottom Half: Feature Cards Grid (Compact & Absolute Fit) */}
+        <div className="flex-none w-full pb-2">
+          
+          {/* Section Headers aligned precisely to the reference image */}
+          <div className="flex flex-col items-center text-center space-y-1 mb-4">
+            <span className="text-[10px] text-cyan-400 font-extrabold uppercase tracking-[0.3em] font-mono drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">
+              FEATURES
+            </span>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight uppercase font-display drop-shadow-md">
+              WHY IS IT USEFUL?
+            </h2>
+          </div>
+
+          {/* 4 Feature Cards Row - Exact Match to User Reference */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+            {features.map((feat, idx) => {
+              const Icon = feat.icon;
+              return (
+                <div 
+                  key={idx}
+                  onClick={onEnterPortal}
+                  className="glass-glossy p-5 flex flex-col justify-start text-left h-[180px] cursor-pointer group"
+                >
+                  {/* Circular Icon Top Left */}
+                  <div className="mb-4">
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center border ${feat.iconGlow}`}>
+                      <Icon className={`w-4 h-4 ${feat.iconColor}`} />
+                    </div>
                   </div>
+
+                  {/* Title */}
+                  <h3 className="text-sm font-extrabold text-white tracking-widest uppercase mb-2 font-display group-hover:text-blue-400 transition-colors drop-shadow-sm">
+                    {feat.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-[11px] text-slate-400 leading-relaxed font-light line-clamp-3">
+                    {feat.desc}
+                  </p>
                 </div>
+              );
+            })}
+          </div>
 
-                {/* Title */}
-                <h3 className="text-[11px] font-extrabold text-white tracking-wider uppercase mb-1.5 font-display group-hover:text-blue-400 transition-colors">
-                  {feat.title}
-                </h3>
-
-                {/* Description */}
-                <p className="text-[10px] text-slate-400 leading-relaxed font-light line-clamp-4">
-                  {feat.desc}
-                </p>
-              </div>
-            );
-          })}
         </div>
 
       </main>
-
-      {/* Footer */}
-      <footer className="w-full flex items-center justify-center text-[8px] text-slate-600 tracking-widest uppercase font-mono py-1.5 border-t border-slate-900/40">
-        © {new Date().getFullYear()} SocGen Sentinel. All Rights Reserved.
-      </footer>
     </div>
   );
 }
