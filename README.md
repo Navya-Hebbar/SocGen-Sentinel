@@ -95,7 +95,6 @@ Visit `http://localhost:5173` in your browser.
 **Navya Gopalkrishna Hebbar**<br>
 **Rajata Hegde**
 
-<iframe src="[https://google.com](https://drive.google.com/drive/folders/1deIRquxT9oyahouYxcoEiNcyv6BatX4V)" width="640" height="480" allow="autoplay" allowfullscreen></iframe>
 ---
 *Developed for the Societe Generale Hackathon.*
 
