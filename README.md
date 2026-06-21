@@ -10,7 +10,7 @@
 
 **SocGen Sentinel** is an advanced, full-stack cybersecurity intelligence platform built to automate third-party vendor risk assessments. By combining state-of-the-art **Machine Learning (XGBoost)**, **Generative AI NLP (Google Gemini 2.0)**, and **Live Threat Intelligence Feeds**, Sentinel eliminates manual auditing bottlenecks. It empowers enterprise security teams to detect, analyze, and mitigate supply chain vulnerabilities in real-time.
 
-![Architecture Diagram](architecture.png)
+![Architecture Diagram](screenshots/architecture.png)
 
 ---
 
