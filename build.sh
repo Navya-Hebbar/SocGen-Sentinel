@@ -12,8 +12,8 @@ cd ..
 
 # Move the built dist folder to backend/static
 echo "Bundling Frontend into Backend..."
-rm -rf backend/app/static
-mv frontend/dist backend/app/static
+rm -rf backend/static
+mv frontend/dist backend/static
 
 # Install Backend Dependencies
 echo "Installing Backend Dependencies..."
