@@ -87,6 +87,7 @@ npm run dev
 Visit `http://localhost:5173` in your browser.
 
 ### Contributors 
+#### Team : NavRaj Innovators 
 **Navya Gopalkrishna Hebbar**<br>
 **Rajata Hegde**
 
