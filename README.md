@@ -32,9 +32,6 @@ Built on a high-performance **Python FastAPI** server, the intelligence layer ha
 
 ### 3. Presentation Layer (Frontend)
 A highly responsive **React + Vite** SPA (Single Page Application) utilizing **Tailwind CSS** for a premium, dark-mode cybersecurity aesthetic.
-
-![Sentinel Dashboard UI](screen_dashboard.png)
-
 * Maintains complex global state using React Hooks.
 * Renders real-time data visualizations (Heatmaps, Risk Distributions, Progress Arcs).
 * Triggers dynamic, asynchronous interactions with the Intelligence Engine.
@@ -104,6 +101,27 @@ npm run dev
 ```
 
 Visit `http://localhost:5173` to access the Sentinel Dashboard.
+
+---
+
+## 💻 User Interface Showcase
+
+Below are the high-fidelity user interface screens generated dynamically via localhost:
+
+### 1. The Global Intelligence Dashboard
+![Dashboard](screenshot_1_dashboard.png)
+
+### 2. Centralized Vendor Registry
+![Vendors](screenshot_2_vendors.png)
+
+### 3. Interactive Risk Analysis Sandbox
+![Risk Analysis](screenshot_3_risk_analysis.png)
+
+### 4. ML-Powered Future Risk Trajectories
+![Future Risk](screenshot_4_future_risk.png)
+
+### 5. Live Threat Intelligence & Breach Monitor
+![Breach Monitor](screenshot_5_breach_monitor.png)
 
 ---
 *Developed for the Societe Generale Hackathon.*
