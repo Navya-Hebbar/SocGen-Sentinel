@@ -86,11 +86,10 @@ npm run dev
 
 Visit `http://localhost:5173` in your browser.
 
+### Contributors 
+Navya Gopalkrishna Hebbar
+Rajata Hegde
+
 ---
 *Developed for the Societe Generale Hackathon.*
 
-### Contributors 
-'''bash
-Navya Gopalkrishna Hebbar
-Rajata Hegde
-'''
