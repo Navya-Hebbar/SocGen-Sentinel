@@ -35,11 +35,11 @@ export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollaps
     <motion.div
       animate={{ width: collapsed ? 76 : 260 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="h-screen sticky top-0 left-0 bg-slate-950 border-r border-slate-900 flex flex-col justify-between z-30 select-none text-slate-300"
+      className="print:hidden h-screen sticky top-0 left-0 bg-black/40 backdrop-blur-md border-r border-white/10 flex flex-col justify-between z-30 select-none text-zinc-400"
     >
       <div>
         {/* Logo Section */}
-        <div className="flex items-center justify-between p-4 h-16 border-b border-slate-900">
+        <div className="flex items-center justify-between p-4 h-16 border-b border-white/10">
           {!collapsed ? (
             <motion.div 
               initial={{ opacity: 0 }}
@@ -47,20 +47,20 @@ export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollaps
               transition={{ delay: 0.1 }}
               className="flex items-center gap-2"
             >
-              <ShieldAlert className="w-6 h-6 text-blue-500 neon-text-blue" />
+              <ShieldAlert className="w-6 h-6 text-blue-500" />
               <span className="font-display font-bold text-lg text-white tracking-wider">
                 SOCGEN <span className="text-blue-500">SENTINEL</span>
               </span>
             </motion.div>
           ) : (
             <div className="mx-auto">
-              <ShieldAlert className="w-6 h-6 text-blue-500 neon-text-blue" />
+              <ShieldAlert className="w-6 h-6 text-blue-500" />
             </div>
           )}
 
           <button 
             onClick={() => setCollapsed(!collapsed)}
-            className="p-1 rounded-md bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-blue-500/50 transition-colors"
+            className="p-1 rounded-md bg-[#18181b] border border-[#27272a] text-zinc-400 hover:text-white hover:border-blue-500/50 transition-colors"
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
@@ -73,7 +73,7 @@ export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollaps
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-slate-400">Threat Guard Active: Secure</span>
+            <span className="text-zinc-400">System Active: Secure</span>
           </div>
         )}
 
@@ -93,18 +93,18 @@ export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollaps
                 )}
                 {item.section && collapsed && (
                   <div className="pt-2 pb-1">
-                    <div className="h-px bg-slate-900 mx-3"></div>
+                    <div className="h-px bg-[#27272a] mx-3"></div>
                   </div>
                 )}
                 <button
                   onClick={() => setActiveTab(item.id)}
                   className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all group relative ${
                     isActive 
-                      ? "bg-blue-600/10 text-white border-l-2 border-blue-500 shadow-[inset_4px_0_12px_rgba(59,130,246,0.05)]" 
-                      : "hover:bg-slate-900/60 hover:text-white text-slate-400"
+                      ? "bg-blue-600/10 text-white border-l-2 border-blue-500" 
+                      : "hover:bg-[#18181b] hover:text-white text-zinc-400"
                   }`}
                 >
-                  <Icon className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 ${isActive ? "text-blue-500" : "text-slate-400 group-hover:text-blue-400"}`} />
+                  <Icon className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 ${isActive ? "text-blue-500" : "text-zinc-500 group-hover:text-blue-400"}`} />
                   {!collapsed && (
                     <motion.span
                       initial={{ opacity: 0 }}
@@ -115,7 +115,7 @@ export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollaps
                     </motion.span>
                   )}
                   {collapsed && (
-                    <div className="absolute left-full ml-4 px-2 py-1 bg-slate-950 border border-slate-800 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity whitespace-nowrap z-50 shadow-xl">
+                      <div className="absolute left-full ml-4 px-2 py-1 bg-[#18181b] border border-[#27272a] text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity whitespace-nowrap z-50 shadow-xl">
                       {item.label}
                     </div>
                   )}
@@ -126,12 +126,12 @@ export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollaps
         </nav>
       </div>
       {/* Sign Out Button */}
-      <div className="p-3 border-t border-slate-900/60 mt-auto">
+      <div className="p-3 border-t border-white/10 mt-auto">
         <button
           onClick={onSignOut}
-          className="w-full flex items-center gap-3 p-2.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group cursor-pointer"
+          className="w-full flex items-center gap-3 p-2.5 rounded-lg text-xs font-semibold text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group cursor-pointer"
         >
-          <LogOut className="w-4 h-4 text-slate-500 group-hover:text-red-400 transition-colors" />
+          <LogOut className="w-4 h-4 text-zinc-500 group-hover:text-red-400 transition-colors" />
           {!collapsed && <span className="uppercase tracking-wider">Sign Out</span>}
         </button>
       </div>

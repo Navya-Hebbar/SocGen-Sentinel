@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
@@ -94,60 +94,12 @@ export default function App() {
             }));
             setRecentActivities(activities);
             setNotifications(activities.slice(0, 3));
-          } else {
-            // fallback recent activities
-            const fallbackActs = backendVendors.slice(0, 5).map(v => ({
-              id: `act-${v.id}`,
-              vendorName: v.name,
-              type: v.breachStatus ? "breach" : "compliance",
-              content: v.riskFactors[0] || "Routine audit review complete",
-              timestamp: "Recent"
-            }));
-            setRecentActivities(fallbackActs);
-            setNotifications(fallbackActs.slice(0, 3));
           }
           return;
         }
       } catch (err) {
-        console.warn("Backend unavailable, falling back to static data.json", err);
+        console.warn("Backend unavailable:", err);
       }
-      
-      // Fallback to static data.json
-      fetch("/data.json")
-        .then(res => res.json())
-        .then(data => {
-          if (data.vendors) {
-            setVendors(data.vendors);
-            const alerts = [];
-            data.vendors.forEach(v => {
-              if (v.certifications) {
-                v.certifications.forEach(c => {
-                  if (c.status === "Expired") {
-                    alerts.push({
-                      id: `exp-${v.id}-${c.name}`,
-                      vendorName: v.name,
-                      certName: c.name,
-                      status: "expired",
-                      expiryDate: c.expiryDate
-                    });
-                  }
-                });
-              }
-            });
-            setExpiryAlerts(alerts);
-          }
-          if (data.recentActivities) {
-            setRecentActivities(data.recentActivities);
-            setNotifications(data.recentActivities.slice(0, 3));
-          }
-          if (data.contracts) {
-            setContracts(data.contracts);
-          }
-          if (data.complianceStandards) {
-            setComplianceStandards(data.complianceStandards);
-          }
-        })
-        .catch(err => console.error("Error loading dynamic data:", err));
     }
     
     loadAllData();
@@ -179,28 +131,25 @@ export default function App() {
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [heatmapFilter, setHeatmapFilter] = useState(null);
 
-  const getBgStyle = () => {
-    switch (activeTab) {
-      case "dashboard":
-        return "url('/cyber_sentinel_bg.png')";
-      case "vendors":
-        return "url('/cyber_vendors_bg.png')";
-      case "riskAnalysis":
-        return "url('/cyber_risk_bg.png')";
-      case "compliance":
-        return "url('/cyber_compliance_bg.png')";
-      case "contractAI":
-        return "url('/cyber_contract_bg.png')";
-      case "futureRisk":
-        return "url('/cyber_risk_bg.png')";
-      case "breachMonitor":
-        return "url('/cyber_sentinel_bg.png')";
-      case "auditReport":
-        return "url('/cyber_compliance_bg.png')";
-      default:
-        return "url('/cyber_sentinel_bg.png')";
-    }
-  };
+  // Dynamically update body background based on active tab
+  useEffect(() => {
+    const getBgUrl = () => {
+      switch (activeTab) {
+        case "vendors": return "url('/cyber_vendors_bg.png')";
+        case "riskAnalysis": 
+        case "futureRisk":
+        case "breachMonitor": return "url('/cyber_risk_bg.png')";
+        case "compliance": 
+        case "auditReport": return "url('/cyber_compliance_bg.png')";
+        case "contractAI": return "url('/cyber_contract_bg.png')";
+        case "dashboard":
+        default: return "url('/cyber_sentinel_bg.png')";
+      }
+    };
+    
+    // Apply background with our sleek dark overlay gradient
+    document.body.style.backgroundImage = `linear-gradient(rgba(3, 7, 18, 0.85), rgba(3, 7, 18, 0.95)), ${getBgUrl()}`;
+  }, [activeTab]);
 
   // Router dispatcher
   const renderTabContent = () => {
@@ -290,14 +239,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex font-sans selection:bg-blue-600/30 selection:text-white relative overflow-hidden">
-      {/* Dynamic Background Image HUD Layer with smooth transition */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-fixed transition-all duration-1000 ease-in-out pointer-events-none z-0"
-        style={{
-          backgroundImage: `linear-gradient(rgba(3, 7, 18, 0.88), rgba(3, 7, 18, 0.94)), ${getBgStyle()}`
-        }}
-      ></div>
+    <div className="min-h-screen bg-transparent flex print:block font-sans selection:bg-blue-600/30 selection:text-white relative overflow-hidden print:overflow-visible">
 
       {/* Background Graphic Accents */}
       <div className="absolute top-0 right-0 w-[45rem] h-[45rem] bg-blue-900/10 rounded-full blur-[10rem] pointer-events-none z-0"></div>
@@ -313,7 +255,7 @@ export default function App() {
       />
 
       {/* Main Panel Shell */}
-      <div className="flex-1 flex flex-col min-w-0 z-10 relative cyber-grid">
+      <div className="flex-1 flex flex-col print:block min-w-0 z-10 relative">
         {/* Top Navbar */}
         <Navbar 
           activeTab={activeTab} 
@@ -323,7 +265,7 @@ export default function App() {
         />
 
         {/* View Frame */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto print:overflow-visible">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}

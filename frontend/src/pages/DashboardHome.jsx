@@ -128,37 +128,34 @@ export default function DashboardHome({
     >
       {/* Visual Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl glass-panel relative overflow-hidden">
-        <div className="radial-glow absolute inset-0"></div>
         <div className="z-10 space-y-1">
-          <span className="text-[10px] bg-blue-500/15 border border-blue-500/30 text-blue-400 px-2 py-0.5 rounded font-mono uppercase tracking-widest">SecOps Control Portal</span>
-          <h2 className="text-xl font-bold font-display text-white mt-1.5">SocGen Sentinel Security Center</h2>
-          <p className="text-xs text-slate-400 font-light">AI-Powered Third-Party Vendor Risk Intelligence Platform</p>
+          <span className="text-[10px] bg-blue-500/15 border border-blue-500/30 text-blue-400 px-2 py-0.5 rounded font-mono uppercase tracking-widest">Security Operations Portal</span>
+          <h2 className="text-xl font-bold font-display text-white mt-1.5">SocGen Sentinel Dashboard</h2>
+          <p className="text-xs text-slate-400 font-light">Third-Party Vendor Risk Management Platform</p>
         </div>
         <div className="z-10 flex items-center gap-3">
           <span className="flex h-2.5 w-2.5 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
           </span>
-          <span className="text-xs text-emerald-400 font-semibold tracking-wider uppercase font-mono">Ecosystem Shield Active</span>
+          <span className="text-xs text-emerald-400 font-semibold tracking-wider uppercase font-mono">System Active</span>
         </div>
       </div>
 
       <ProductionBanner 
-        title="Production Deployment: Continuous Threat Surveillance" 
-        description="This dashboard aggregates real-time metrics across your live enterprise environment. It automatically evaluates the overall Ecosystem Shield Index based on active SOC2/ISO certificates, CISA KEV vulnerability cross-references, and Gemini 2.0 AI contract risk analysis."
+        title="Continuous Threat Monitoring" 
+        description="This dashboard displays real-time metrics across your vendors. It automatically evaluates the overall security score based on active SOC2/ISO certificates, vulnerabilities, and contract risk analysis."
       />
 
       {vendors.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-12 text-center glass-panel rounded-2xl max-w-xl mx-auto space-y-6 relative overflow-hidden my-12">
-          <div className="radial-glow absolute inset-0"></div>
-          <div className="cyber-scanner"></div>
           <div className="p-4 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400">
             <ShieldAlert className="w-10 h-10 animate-pulse" />
           </div>
           <div className="space-y-2 z-10">
             <h3 className="font-display font-semibold text-lg text-white">Ecosystem Registry Empty</h3>
             <p className="text-xs text-slate-400 leading-relaxed font-light">
-              Awaiting vendor data payload. Populate the central database catalog at <code className="text-blue-400 bg-slate-900 px-1.5 py-0.5 rounded">public/data.json</code> to initialize automated security feeds and compliance charts.
+              Awaiting vendor data payload. Populate the central database catalog at <code className="text-blue-400 bg-[#18181b] px-1.5 py-0.5 rounded">public/data.json</code> to initialize automated security feeds and compliance charts.
             </p>
           </div>
           <div className="flex gap-3 z-10">
@@ -178,12 +175,11 @@ export default function DashboardHome({
               { label: "Total Vendors", value: totalVendors, icon: Users, color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20", glowClass: "icon-glow-blue" },
               { label: "High Risk Focus", value: highRiskVendors, icon: AlertTriangle, color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/20", glowClass: "icon-glow-orange" },
               { label: "Expired Certifications", value: expiredCertsCount, icon: Clock, color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20", glowClass: "icon-glow-yellow" },
-              { label: "Active Breaches", value: breachedVendorsCount, icon: ShieldAlert, color: breachedVendorsCount > 0 ? "text-red-400 pulse-red animate-pulse" : "text-slate-400", bg: breachedVendorsCount > 0 ? "bg-red-500/10 border-red-500/30" : "bg-slate-900 border-slate-800", glowClass: breachedVendorsCount > 0 ? "icon-glow-red" : "icon-glow-blue" }
+              { label: "Active Breaches", value: breachedVendorsCount, icon: ShieldAlert, color: breachedVendorsCount > 0 ? "text-red-400 pulse-red" : "text-zinc-400", bg: breachedVendorsCount > 0 ? "bg-red-500/10 border-red-500/30" : "bg-[#18181b] border-[#27272a]", glowClass: breachedVendorsCount > 0 ? "icon-glow-red" : "icon-glow-blue" }
             ].map((stat, i) => {
               const Icon = stat.icon;
               return (
                 <div key={i} className="glass-panel glow-card-hover rounded-xl p-4 flex items-center justify-between relative overflow-hidden h-20">
-                  <div className="radial-glow absolute inset-0"></div>
                   <div className="z-10">
                     <span className="text-[10px] text-slate-500 uppercase tracking-widest block font-medium">{stat.label}</span>
                     <span className="text-2xl font-bold font-display text-white mt-1 block">{stat.value}</span>
@@ -202,7 +198,7 @@ export default function DashboardHome({
             {/* Left Column: Security Shield circular Index (Minimalist WOW factor) */}
             <div className="glass-panel rounded-xl p-5 flex flex-col justify-between items-center min-h-[300px]">
               <div className="w-full">
-                <h4 className="font-display font-semibold text-xs text-white uppercase tracking-wider">Ecosystem Shield Index</h4>
+                <h4 className="font-display font-semibold text-xs text-white uppercase tracking-wider">Overall Security Score</h4>
                 <p className="text-[10px] text-slate-500">Aggregate security score across all vendors</p>
               </div>
               
@@ -229,7 +225,7 @@ export default function DashboardHome({
                 </div>
               </div>
 
-              <div className="text-[10px] text-slate-400 flex items-center gap-1.5 bg-slate-900/50 border border-slate-800/80 px-3 py-1 rounded-full">
+              <div className="text-[10px] text-zinc-400 flex items-center gap-1.5 bg-[#18181b] border border-[#27272a] px-3 py-1 rounded-full">
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Operational risk remains at <span className="font-semibold text-white">{averageRisk}%</span></span>
               </div>
@@ -314,8 +310,8 @@ export default function DashboardHome({
             <div className="glass-panel rounded-xl p-5 lg:col-span-2 space-y-4">
               <div className="flex justify-between items-center pb-2 border-b border-slate-900/60">
                 <div>
-                  <h4 className="font-display font-semibold text-xs text-white uppercase tracking-wider">Security Roster (High Exposure Target Lists)</h4>
-                  <p className="text-[10px] text-slate-500">Third-party threats requiring review</p>
+                  <h4 className="font-display font-semibold text-xs text-white uppercase tracking-wider">High Risk Vendors</h4>
+                  <p className="text-[10px] text-slate-500">Vendors requiring immediate review</p>
                 </div>
                 <button 
                   onClick={() => setActiveTab("vendors")}
@@ -332,7 +328,7 @@ export default function DashboardHome({
                       <th className="pb-2.5 pl-1">Vendor Name</th>
                       <th className="pb-2.5 text-center">Score</th>
                       <th className="pb-2.5">Risk Level</th>
-                      <th className="pb-2.5">Primary Threat Vector</th>
+                      <th className="pb-2.5">Primary Risk Factor</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-900/60">
@@ -379,8 +375,8 @@ export default function DashboardHome({
             {/* Right Side: Quick Risk Matrix Grid (1/3 Column) */}
             <div className="glass-panel rounded-xl p-5 flex flex-col justify-between min-h-[220px]">
               <div>
-                <h4 className="font-display font-semibold text-xs text-white uppercase tracking-wider">Likelihood vs Impact Matrix</h4>
-                <p className="text-[10px] text-slate-500">Quick-filter vendors by threat grid coordinate</p>
+                <h4 className="font-display font-semibold text-xs text-white uppercase tracking-wider">Risk Matrix</h4>
+                <p className="text-[10px] text-slate-500">Filter vendors by likelihood and impact</p>
               </div>
               
               <div className="grid grid-cols-3 gap-2.5 my-3 flex-grow items-center justify-center">

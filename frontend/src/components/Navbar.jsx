@@ -41,7 +41,7 @@ export default function Navbar({ activeTab, notifications, setNotifications, thr
   const unreadCount = notifications.length;
 
   return (
-    <header className="h-16 border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-20 px-6 flex items-center justify-between select-none">
+    <header className="print:hidden h-16 border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-20 px-6 flex items-center justify-between select-none">
       {/* Breadcrumbs */}
       <div className="flex items-center gap-3">
         <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
@@ -60,13 +60,13 @@ export default function Navbar({ activeTab, notifications, setNotifications, thr
           <input
             type="text"
             placeholder="Search vendor, risk factor, policy..."
-            className="w-64 bg-slate-900/60 border border-slate-800 rounded-lg py-1.5 pl-9 pr-4 text-xs text-slate-300 placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all font-sans"
+            className="w-64 bg-[#18181b] border border-[#27272a] rounded-lg py-1.5 pl-9 pr-4 text-xs text-slate-300 placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all font-sans"
           />
           <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-500" />
         </div>
 
         {/* Global Risk Threat Level Indicator */}
-        <div className={`flex items-center gap-2 bg-slate-900/60 border ${threatLevel.border || "border-slate-800/80"} rounded-lg px-3 py-1.5 text-xs text-slate-400`}>
+        <div className={`flex items-center gap-2 bg-[#18181b] border ${threatLevel.border || "border-[#27272a]"} rounded-lg px-3 py-1.5 text-xs text-slate-400`}>
           <ShieldAlert className={`w-3.5 h-3.5 ${threatLevel.color || "text-orange-400"} ${threatLevel.label !== "SECURE" ? "animate-pulse" : ""}`} />
           <span className="hidden sm:inline">Threat Level:</span>
           <span className={`font-semibold ${threatLevel.color || "text-orange-400"} tracking-wider`}>
@@ -78,7 +78,7 @@ export default function Navbar({ activeTab, notifications, setNotifications, thr
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className={`p-2 rounded-lg border bg-slate-900/50 border-slate-800 text-slate-400 hover:text-white hover:border-blue-500/30 transition-all relative ${showNotifications ? "text-white border-blue-500/40" : ""}`}
+            className={`p-2 rounded-lg border bg-[#18181b] border-[#27272a] text-slate-400 hover:text-white hover:border-blue-500/30 transition-all relative ${showNotifications ? "text-white border-blue-500/40" : ""}`}
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
@@ -90,8 +90,8 @@ export default function Navbar({ activeTab, notifications, setNotifications, thr
 
           {/* Notifications Dropdown Panel */}
           {showNotifications && (
-            <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-800/80 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-lg">
-              <div className="p-3 border-b border-slate-800/80 bg-slate-950/40 flex items-center justify-between">
+            <div className="absolute right-0 mt-3 w-80 bg-[#111111] border border-white/10 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-lg">
+              <div className="p-3 border-b border-white/10 bg-[#18181b] flex items-center justify-between">
                 <span className="font-display font-semibold text-xs text-white">Alert Logs ({unreadCount})</span>
                 {unreadCount > 0 && (
                   <button 
@@ -102,7 +102,7 @@ export default function Navbar({ activeTab, notifications, setNotifications, thr
                   </button>
                 )}
               </div>
-              <div className="max-h-72 overflow-y-auto divide-y divide-slate-800/60">
+              <div className="max-h-72 overflow-y-auto divide-y divide-[#27272a]">
                 {notifications.length === 0 ? (
                   <div className="p-6 text-center text-slate-500 text-xs">
                     <CheckCircle2 className="w-6 h-6 text-emerald-500/80 mx-auto mb-2" />
@@ -110,7 +110,7 @@ export default function Navbar({ activeTab, notifications, setNotifications, thr
                   </div>
                 ) : (
                   notifications.map((item) => (
-                    <div key={item.id} className="p-3 hover:bg-slate-950/40 transition-colors relative group">
+                    <div key={item.id} className="p-3 hover:bg-[#18181b] transition-colors relative group">
                       <button 
                         onClick={() => handleDismissNotification(item.id)}
                         className="absolute top-2 right-2 text-slate-600 hover:text-white p-0.5 rounded transition-colors opacity-0 group-hover:opacity-100"

@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  FileText, 
-  UploadCloud, 
-  ShieldAlert, 
-  ChevronRight, 
-  AlertOctagon, 
-  Sparkles,
-  CheckCircle,
-  FileCheck,
-  RefreshCw,
-  Info
+  FileText, UploadCloud, ShieldAlert, AlertOctagon, 
+  Sparkles, CheckCircle, FileCheck, RefreshCw, 
+  Printer, Download, Shield, Gavel
 } from "lucide-react";
 import ProductionBanner from "../components/ProductionBanner";
+import { uploadContract } from "../utils/api";
 
-// Import API Helpers
-import { uploadContract, fetchContracts } from "../utils/api";
 export default function ContractAI({ contracts, setContracts }) {
   const [selectedContractId, setSelectedContractId] = useState("");
   const [contract, setContract] = useState(null);
+  const [scanning, setScanning] = useState(false);
+  const [progressText, setProgressText] = useState("");
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     if (contracts && contracts.length > 0 && !selectedContractId) {
@@ -26,10 +21,6 @@ export default function ContractAI({ contracts, setContracts }) {
       setContract(contracts[0]);
     }
   }, [contracts, selectedContractId]);
-  
-  // Loading states
-  const [scanning, setScanning] = useState(false);
-  const [progressText, setProgressText] = useState("");
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -38,13 +29,8 @@ export default function ContractAI({ contracts, setContracts }) {
     setScanning(true);
     setProgressText("Initializing AI OCR Engine...");
     
-    const p1 = setTimeout(() => {
-      setProgressText("Identifying legal nodes & clause structures...");
-    }, 1200);
-    
-    const p2 = setTimeout(() => {
-      setProgressText("Analyzing terms with Gemini AI model...");
-    }, 2400);
+    const p1 = setTimeout(() => { setProgressText("Identifying legal nodes & clause structures..."); }, 1200);
+    const p2 = setTimeout(() => { setProgressText("Analyzing terms with Gemini AI model..."); }, 2400);
 
     const res = await uploadContract(file);
     
@@ -52,26 +38,35 @@ export default function ContractAI({ contracts, setContracts }) {
     clearTimeout(p2);
 
     if (res && res.id) {
-      if (setContracts) {
-        setContracts(prev => [res, ...prev]);
-      }
+      if (setContracts) setContracts(prev => [res, ...prev]);
       setSelectedContractId(res.id);
       setContract(res);
     } else {
-      // Fallback mock contract creation
+      // Fallback
       const fileName = file.name;
       let parsedVendorName = "Uploaded Vendor";
       const parts = fileName.split(/[_\-\s\.]/);
       if (parts.length > 0 && parts[0].toLowerCase() !== "contract" && parts[0].toLowerCase() !== "sla") {
         parsedVendorName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
       }
-
       const customClauses = [
         {
-          clauseText: "Section 11.2: Vendor liability for cyber breaches is capped at the fees paid in the preceding three (3) months.",
+          clauseText: "Section 4. Limitation of Liability: The Vendor's maximum liability for any data breach, regardless of negligence, shall not exceed $100.",
           riskSeverity: "Critical",
-          riskExplanation: "Extremely low liability cap fails to protect the bank against costly notification and recovery expenses following breaches.",
-          recommendedFix: "Renegotiate to exclude cyber breaches from the limitation of liability cap entirely, or set a minimum cap of $5,000,000."
+          riskExplanation: "An extremely low liability cap ($100) and refusal to handle breach notifications leaves SocGen fully exposed to massive financial damages.",
+          recommendedFix: "Renegotiate to entirely exclude cyber breaches from the limitation of liability cap. Mandate that Vendor covers all costs related to forensic investigations."
+        },
+        {
+          clauseText: "Section 2. Data Processing: Vendor reserves the right to share data with third-party subprocessors without notifying the Client or obtaining prior written consent.",
+          riskSeverity: "Critical",
+          riskExplanation: "Direct violation of GDPR Article 28(2), which mandates prior written authorization before engaging another processor, vastly increasing supply-chain attack surface.",
+          recommendedFix: "Require a minimum of 30 days prior written notice for any new subprocessor, and explicitly reserve the right to object to or terminate the contract."
+        },
+        {
+          clauseText: "Section 3. Security Requirements: The Vendor is not required to maintain SOC 2 Type II compliance or undergo annual penetration testing.",
+          riskSeverity: "High",
+          riskExplanation: "A lack of SOC 2 or penetration testing provides zero assurance of the vendor's internal security controls.",
+          recommendedFix: "Strike this section. Mandate annual third-party penetration testing and require continuous SOC 2 Type II compliance as a material condition."
         }
       ];
 
@@ -85,196 +80,223 @@ export default function ContractAI({ contracts, setContracts }) {
         clauses: customClauses
       };
 
-      if (setContracts) {
-        setContracts(prev => [newContract, ...prev]);
-      }
+      if (setContracts) setContracts(prev => [newContract, ...prev]);
       setSelectedContractId(newContract.id);
       setContract(newContract);
     }
     setScanning(false);
   };
 
-  // Select sample contract
   const handleSelectContract = (id) => {
     setSelectedContractId(id);
     const doc = contracts.find(c => c.id === id);
     if (doc) {
       setScanning(true);
       setProgressText("Initializing AI OCR Engine...");
-      
-      setTimeout(() => {
-        setProgressText("Identifying legal nodes & clause structures...");
-      }, 1000);
-      
-      setTimeout(() => {
-        setProgressText("Evaluating against SocGen Compliance Rules...");
-      }, 2000);
-
-      setTimeout(() => {
-        setContract(doc);
-        setScanning(false);
-      }, 3000);
+      setTimeout(() => { setProgressText("Identifying legal nodes..."); }, 800);
+      setTimeout(() => { setProgressText("Evaluating Compliance Rules..."); }, 1600);
+      setTimeout(() => { setContract(doc); setScanning(false); }, 2400);
     }
+  };
+
+  const handlePrint = () => {
+    setGenerating(true);
+    setTimeout(() => {
+      window.print();
+      setGenerating(false);
+    }, 500);
   };
 
   const getSeverityStyles = (severity) => {
     switch (severity) {
-      case "Critical": return "bg-red-500/10 border-red-500/20 text-red-400";
-      case "Moderate": return "bg-orange-500/10 border-orange-500/20 text-orange-400";
-      default: return "bg-blue-500/10 border-blue-500/20 text-blue-400";
+      case "Critical": return "bg-red-500/10 border-red-500/30 text-red-400";
+      case "High": return "bg-orange-500/10 border-orange-500/30 text-orange-400";
+      case "Medium": return "bg-yellow-500/10 border-yellow-500/30 text-yellow-400";
+      default: return "bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
     }
   };
 
   const getStatusStyles = (status) => {
-    switch (status) {
-      case "Approved": return "text-emerald-400 bg-emerald-500/10 border border-emerald-500/20";
-      case "Passed with Warnings": return "text-yellow-400 bg-yellow-500/10 border border-yellow-500/20";
-      default: return "text-red-400 bg-red-500/10 border border-red-500/20";
-    }
+    if (status === "Approved") return "text-emerald-400 bg-emerald-500/10 border border-emerald-500/30";
+    if (status === "Passed with Warnings") return "text-yellow-400 bg-yellow-500/10 border border-yellow-500/30";
+    return "text-red-400 bg-red-500/10 border border-red-500/30";
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <ProductionBanner 
-        title="Production Deployment: Generative AI Contract Analysis" 
-        description="Upload actual vendor SLAs, Master Service Agreements (MSAs), or DPA PDFs. The backend utilizes Google's Gemini 2.0 Flash engine to parse the legal text, extract liability caps, and pinpoint GDPR/SOC2 compliance violations automatically."
-      />
-
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold font-display text-white">Contract AI Intelligence</h2>
-          <p className="text-xs text-slate-500 mt-0.5 font-light">NLP legal parser highlights high-risk vendor SLA liabilities automatically</p>
+    <div className="p-4 md:p-8 flex flex-col print:block items-center pb-24 print:p-0 print:pb-0">
+      
+      {/* Print Action Bar */}
+      <div className="w-full max-w-6xl flex justify-between items-end mb-4 print:hidden">
+        <div className="max-w-xl">
+          <h2 className="text-2xl font-bold font-display text-white">Contract AI Intelligence</h2>
+          <p className="text-xs text-slate-400 mt-1">Upload an SLA or MSA PDF. The Gemini AI engine will parse the text and flag dangerous liability caps and compliance violations.</p>
         </div>
-        <div className="flex gap-2">
-          {contracts && contracts.map(c => (
-            <button
-              key={c.id}
-              onClick={() => handleSelectContract(c.id)}
-              className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
-                selectedContractId === c.id 
-                  ? "bg-blue-600/15 border-blue-500/40 text-white" 
-                  : "bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700"
-              }`}
-            >
-              {c.vendorName} Agreement
-            </button>
-          ))}
-        </div>
+        <button
+          onClick={handlePrint}
+          disabled={generating || !contract}
+          className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold text-xs rounded shadow-lg transition-all uppercase tracking-widest flex-shrink-0"
+        >
+          {generating ? <Download className="w-4 h-4 animate-bounce" /> : <Printer className="w-4 h-4" />}
+          {generating ? "Preparing PDF..." : "Export Legal Review"}
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="w-full max-w-6xl flex flex-col lg:flex-row print:block gap-6 items-start">
         
-        {/* Left Drag & Drop Uploader (Interactive Sandbox) */}
-        <div className="glass-panel rounded-xl p-5 flex flex-col justify-between min-h-[380px]">
-          <div>
-            <h4 className="font-display font-semibold text-sm text-white flex items-center gap-2">
-              <UploadCloud className="w-4 h-4 text-blue-500" /> SLA Document Portal
+        {/* Left Column: Interactive Uploader (Hidden on Print) */}
+        <div className="w-full lg:w-1/3 space-y-4 print:hidden shrink-0">
+          <div className="glass-panel p-5 rounded-none border border-[#27272a] bg-[#0a0a0a]">
+            <h4 className="font-display font-semibold text-sm text-white flex items-center gap-2 border-b border-[#27272a] pb-3 mb-4">
+              <UploadCloud className="w-4 h-4 text-blue-500" /> Document Portal
             </h4>
-            <p className="text-xs text-slate-500 mt-0.5">Upload a PDF contract to trigger NLP audit check</p>
-          </div>
-
-          <div 
-            onClick={() => document.getElementById("contract-file-upload").click()}
-            className="border border-dashed border-slate-800 hover:border-blue-500/50 rounded-xl p-6 text-center cursor-pointer transition-colors my-5 flex flex-col items-center justify-center flex-grow bg-slate-900/10 group"
-          >
-            <input 
-              type="file" 
-              id="contract-file-upload" 
-              className="hidden" 
-              accept=".pdf,.txt,.docx" 
-              onChange={handleFileUpload} 
-            />
-            <UploadCloud className="w-8 h-8 text-slate-500 mb-3 group-hover:text-blue-500 transition-colors" />
-            <span className="text-xs font-semibold text-slate-300 group-hover:text-white transition-colors">Click to upload SLA document</span>
-            <span className="text-[10px] text-slate-600 mt-1">Accepts PDF, DOCX, TXT (Max 25MB)</span>
-          </div>
-
-          <div className="bg-blue-950/20 border border-blue-900/30 p-3 rounded-lg flex items-start gap-2.5 text-xs text-blue-300">
-            <Sparkles className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-            <p className="leading-relaxed font-light">
-              SocGen Sentinel AI reviews legal clauses against 22 key regulatory principles including GDPR Article 28 and internal bank liability ceilings.
-            </p>
+            
+            <div 
+              onClick={() => document.getElementById("contract-file-upload").click()}
+              className="border border-dashed border-slate-700 hover:border-blue-500 bg-[#111111] p-6 text-center cursor-pointer transition-colors flex flex-col items-center justify-center min-h-[160px] group"
+            >
+              <input type="file" id="contract-file-upload" className="hidden" accept=".pdf,.txt,.docx" onChange={handleFileUpload} />
+              <UploadCloud className="w-8 h-8 text-slate-500 mb-3 group-hover:text-blue-500 transition-colors" />
+              <span className="text-xs font-semibold text-slate-300 group-hover:text-white transition-colors">Click to upload SLA document</span>
+              <span className="text-[10px] text-slate-600 mt-1">Accepts PDF, DOCX, TXT</span>
+            </div>
+            
+            <div className="mt-4 pt-4 border-t border-[#27272a]">
+              <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-2 font-semibold">Previous Scans</p>
+              <div className="flex flex-col gap-2 max-h-[150px] overflow-y-auto pr-1">
+                {contracts && contracts.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => handleSelectContract(c.id)}
+                    className={`text-left px-3 py-2 border text-[10px] font-mono transition-all truncate ${
+                      selectedContractId === c.id 
+                        ? "bg-blue-600/10 border-blue-500/50 text-blue-300" 
+                        : "bg-[#111111] border-[#27272a] text-slate-400 hover:border-slate-600"
+                    }`}
+                  >
+                    {c.vendorName}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Right Clauses analysis */}
-        <div className="glass-panel rounded-xl p-5 lg:col-span-2 flex flex-col justify-between min-h-[380px] relative">
+        {/* Right Column: Official Document Review (Expands on Print) */}
+        <div className="w-full lg:w-2/3 print:w-full bg-[#0a0a0a] border border-[#27272a] shadow-2xl relative min-h-[600px] print:block print:min-h-0 print:border-none print:shadow-none print:overflow-visible">
           
-          <AnimatePresence mode="wait">
-            {scanning ? (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-xl p-6"
-              >
-                <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mb-4" />
-                <p className="text-sm font-semibold text-white font-display uppercase tracking-widest">{progressText}</p>
-                <div className="w-48 bg-slate-900 h-1 rounded-full mt-3 overflow-hidden">
-                  <div className="bg-blue-500 h-1 rounded-full w-2/3 animate-[pulse_1.5s_infinite]"></div>
-                </div>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+          {scanning && (
+            <div className="absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur z-20 flex flex-col items-center justify-center p-6 print:hidden">
+              <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mb-4" />
+              <p className="text-sm font-semibold text-white font-display uppercase tracking-widest">{progressText}</p>
+              <div className="w-48 bg-[#18181b] h-1 mt-3 overflow-hidden">
+                <div className="bg-blue-500 h-1 w-2/3 animate-[pulse_1.5s_infinite]"></div>
+              </div>
+            </div>
+          )}
 
-          {contract ? (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center pb-3 border-b border-slate-900">
-                <div>
-                  <h4 className="font-display font-bold text-white text-base leading-tight">
-                    {contract.docName}
-                  </h4>
-                  <span className="text-[10px] text-slate-500">Uploaded on {contract.uploadDate}</span>
+          {!contract && !scanning && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 print:hidden p-8 text-center">
+              <Gavel className="w-12 h-12 text-slate-700 mb-4" />
+              <p className="text-sm uppercase tracking-widest font-display">Awaiting Document</p>
+              <p className="text-xs mt-2 max-w-xs">Upload a vendor contract on the left to generate an automated legal risk review.</p>
+            </div>
+          )}
+
+          {contract && (
+            <div>
+              {/* Report Header */}
+              <div className="border-b-4 border-blue-600 p-6 md:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#111111]">
+                <div className="flex items-center gap-5">
+                  <img src="/socgen_seal.png" alt="Seal" className="h-16 w-auto max-w-[250px] object-contain drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+                  <div>
+                    <h1 className="text-2xl font-display font-black text-white uppercase tracking-tight">AI Legal Audit Brief</h1>
+                    <h2 className="text-xs font-mono text-blue-400 tracking-widest mt-1">NLP Risk Extraction Engine</h2>
+                  </div>
                 </div>
-                <div className={`px-2.5 py-0.5 rounded text-[10px] font-bold ${getStatusStyles(contract.aiReviewStatus)}`}>
-                  AI Status: {contract.aiReviewStatus}
+                <div className="text-left sm:text-right">
+                  <p className="text-[10px] text-slate-500 uppercase tracking-widest">Document Target</p>
+                  <p className="text-sm font-bold text-white truncate max-w-[200px]" title={contract.docName}>{contract.docName}</p>
+                  <p className="text-[10px] text-slate-500 mt-1">Vendor: <span className="text-slate-300">{contract.vendorName}</span></p>
                 </div>
               </div>
 
-              {/* Highlighted Clauses */}
-              <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
-                <span className="text-[9px] text-slate-500 uppercase tracking-widest font-bold block mb-1">Flagged Risk Clauses ({contract.clauses.length})</span>
+              {/* Status Banner */}
+              <div className="px-6 md:px-8 py-4 border-b border-[#27272a] bg-[#18181b] flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-6">
+                  <div>
+                    <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Scan Date</p>
+                    <p className="text-xs font-mono text-white">{contract.uploadDate}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Total Flags</p>
+                    <p className="text-xs font-mono text-white">{contract.clauses.length} Discovered</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className={`px-3 py-1 border text-[10px] font-bold uppercase tracking-widest ${getStatusStyles(contract.aiReviewStatus)}`}>
+                    Status: {contract.aiReviewStatus}
+                  </div>
+                  <div className={`px-3 py-1 border text-[10px] font-bold uppercase tracking-widest ${getSeverityStyles(contract.overallRisk)}`}>
+                    Overall Risk: {contract.overallRisk}
+                  </div>
+                </div>
+              </div>
+
+              {/* Clauses Body */}
+              <div className="p-6 md:p-8 space-y-6 max-h-[500px] overflow-y-auto print:max-h-none print:overflow-visible">
+                <div className="flex items-center gap-2 border-b border-[#27272a] pb-2 mb-6">
+                  <FileText className="w-4 h-4 text-blue-500" />
+                  <h3 className="text-sm font-display font-bold text-white uppercase tracking-widest">Extracted High-Risk Clauses</h3>
+                </div>
+
                 {contract.clauses.map((clause, idx) => (
-                  <div key={idx} className="p-3.5 rounded-xl bg-slate-900/30 border border-slate-800/80 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-slate-400 font-semibold flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-blue-500" /> Clause Highlight
+                  <div key={idx} className="border border-[#27272a] bg-[#111111] p-5 space-y-4 print:break-inside-auto">
+                    <div className="flex justify-between items-center pb-3 border-b border-[#27272a]/50">
+                      <span className="text-[10px] text-slate-400 font-mono uppercase tracking-widest flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                        Extraction {idx + 1}
                       </span>
-                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${getSeverityStyles(clause.riskSeverity)}`}>
+                      <span className={`px-2.5 py-0.5 border text-[9px] font-bold uppercase tracking-widest ${getSeverityStyles(clause.riskSeverity)}`}>
                         {clause.riskSeverity} Risk
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-300 italic bg-slate-950/40 p-2.5 rounded-lg border border-slate-900 font-mono leading-relaxed">
-                      "{clause.clauseText}"
-                    </p>
+                    <div className="relative">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-700"></div>
+                      <p className="text-sm text-slate-200 italic pl-4 font-serif leading-relaxed">
+                        "{clause.clauseText}"
+                      </p>
+                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs pt-1">
-                      <div className="p-2.5 rounded-lg bg-red-950/5 border border-red-500/10 space-y-1">
-                        <span className="text-[9px] text-slate-500 uppercase tracking-widest font-semibold block">Risk Rationale</span>
-                        <p className="text-red-300 leading-relaxed font-light">{clause.riskExplanation}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                      <div className="bg-[#18181b] border-l-2 border-red-500/50 p-3">
+                        <span className="text-[9px] text-red-400/80 uppercase tracking-widest font-bold flex items-center gap-1.5 mb-1.5">
+                          <AlertOctagon className="w-3 h-3" /> Risk Exposure
+                        </span>
+                        <p className="text-xs text-slate-300 leading-relaxed font-light">{clause.riskExplanation}</p>
                       </div>
-                      <div className="p-2.5 rounded-lg bg-emerald-950/5 border border-emerald-500/10 space-y-1">
-                        <span className="text-[9px] text-slate-500 uppercase tracking-widest font-semibold block">AI Remediation Advice</span>
-                        <p className="text-emerald-300 leading-relaxed font-light">{clause.recommendedFix}</p>
+                      <div className="bg-[#18181b] border-l-2 border-emerald-500/50 p-3">
+                        <span className="text-[9px] text-emerald-400/80 uppercase tracking-widest font-bold flex items-center gap-1.5 mb-1.5">
+                          <CheckCircle className="w-3 h-3" /> Recommended Remediation
+                        </span>
+                        <p className="text-xs text-slate-300 leading-relaxed font-light">{clause.recommendedFix}</p>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
-          ) : (
-            <div className="text-center py-20 text-slate-500 text-xs">
-              No contract analysis active. Select a vendor agreement or upload.
+
+              {/* Footer */}
+              <div className="bg-[#111111] border-t border-[#27272a] p-4 text-center mt-auto">
+                <p className="text-[9px] text-slate-500 font-mono uppercase tracking-widest">
+                  NLP Review Powered by Gemini 2.0 • SocGen Sentinel Internal
+                </p>
+              </div>
+
             </div>
           )}
 
-          <div className="text-[10px] text-slate-600 text-center uppercase tracking-widest font-semibold mt-4">
-            Security audits verified by NLP Legal Core.
-          </div>
         </div>
-
       </div>
     </div>
   );

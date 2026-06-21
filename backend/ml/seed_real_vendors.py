@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 
-KNOWN_VENDOR_COUNT = 150
-TRACKED_VENDOR_COUNT = 143
-GROUND_TRUTH_HIGH_RISK_COUNT = 20
+KNOWN_VENDOR_COUNT = 400
+TRACKED_VENDOR_COUNT = 400
+GROUND_TRUTH_HIGH_RISK_COUNT = 50
 
 
 VENDOR_TYPES = ["Cloud", "Payment", "MSP", "Integration", "Security", "Contractor", "Backup", "HR"]
@@ -159,10 +159,10 @@ def _generated_vendor(idx):
         ("ELEVATED_RISK_VENDOR", "LOW", 67, "A-", "Employee"),
     ]
 
-    if idx <= 20:
+    if idx <= 60:
         anomaly, severity, base_score, rating, data = high_patterns[(idx - 1) % len(high_patterns)]
-    elif idx <= 120:
-        anomaly, severity, base_score, rating, data = medium_patterns[(idx - 21) % len(medium_patterns)]
+    elif idx <= 320:
+        anomaly, severity, base_score, rating, data = medium_patterns[(idx - 61) % len(medium_patterns)]
     else:
         anomaly, severity, base_score, rating, data = ("NONE", "LOW", 18 + idx % 28, "A", DATA_ACCESS[idx % 3])
 

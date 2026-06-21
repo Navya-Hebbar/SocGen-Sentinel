@@ -322,7 +322,23 @@ async def analyze_contract_endpoint(file: UploadFile = File(...)):
     """Upload and analyze a contract document."""
     try:
         content = await file.read()
-        text_content = content.decode("utf-8", errors="ignore")[:5000]
+        
+        # Robust PDF text parsing
+        if file.filename.lower().endswith(".pdf"):
+            try:
+                import io
+                from pypdf import PdfReader
+                pdf_reader = PdfReader(io.BytesIO(content))
+                text_content = ""
+                for page in pdf_reader.pages[:12]:  # Limit extraction to first 12 pages for performance
+                    text_content += page.extract_text() or ""
+                text_content = text_content.strip()[:5000]
+            except Exception as e:
+                print(f"Warning: Failed to extract text with pypdf: {e}")
+                text_content = content.decode("utf-8", errors="ignore")[:5000]
+        else:
+            text_content = content.decode("utf-8", errors="ignore")[:5000]
+            
         result = analyze_contract(text_content, file.filename)
         
         # Format for frontend contract registry schema

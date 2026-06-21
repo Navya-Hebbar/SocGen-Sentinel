@@ -1,0 +1,68 @@
+[
+  {
+    "id": "c-1782022462",
+    "docName": "AcmeCorp_HighRisk_SLA.txt",
+    "vendorName": "Acmecorp Highrisk Sla.Txt",
+    "uploadDate": "2026-06-21",
+    "aiReviewStatus": "Flagged",
+    "overallRisk": "Critical",
+    "clauses": [
+      {
+        "clauseText": "Section 11.2: Vendor liability for data breaches is limited to fees paid in the preceding 3 months.",
+        "riskSeverity": "Critical",
+        "riskExplanation": "Extremely low liability cap fails to protect against costly breach notification, forensics, and regulatory fine exposure that can exceed $10M.",
+        "recommendedFix": "Renegotiate to exclude cyber and data breach events from the general limitation of liability. Set a minimum floor of $5,000,000 for data breach indemnification."
+      },
+      {
+        "clauseText": "Section 8.4: Service Provider may utilize subprocessors without prior written consent, subject to maintaining equivalent security controls.",
+        "riskSeverity": "Critical",
+        "riskExplanation": "Lack of prior consent mechanism for subprocessor engagement violates GDPR Article 28(2) and increases supply chain attack surface.",
+        "recommendedFix": "Require 30-day prior written notification and right to object for any new subprocessor. Maintain an auditable subprocessor registry."
+      },
+      {
+        "clauseText": "Section 15.3: Either party may terminate without cause upon 60 days written notice.",
+        "riskSeverity": "Moderate",
+        "riskExplanation": "60-day termination window is insufficient for critical infrastructure migration and may cause operational disruption.",
+        "recommendedFix": "Extend termination without cause to 180 days with mandatory transition assistance period and data return obligations."
+      }
+    ]
+  },
+  {
+    "id": "c-sample-1",
+    "docName": "CloudOps_Master_SLA_2026.pdf",
+    "vendorName": "CloudOps",
+    "uploadDate": "2026-06-15",
+    "aiReviewStatus": "Flagged",
+    "overallRisk": "Critical",
+    "clauses": [
+      {
+        "clauseText": "Section 11.2: Vendor liability for data breaches is limited to fees paid in the preceding 3 months.",
+        "riskSeverity": "Critical",
+        "riskExplanation": "Low liability cap fails to protect against costly breach notification and recovery expenses.",
+        "recommendedFix": "Renegotiate to exclude cyber breaches from liability cap. Set minimum floor of $5,000,000."
+      },
+      {
+        "clauseText": "Section 8.4: Service Provider may utilize subprocessors without prior written consent.",
+        "riskSeverity": "Critical",
+        "riskExplanation": "Violates GDPR Article 28(2) and increases supply chain attack surface.",
+        "recommendedFix": "Require 30-day prior notification and right to object for any new subprocessor."
+      }
+    ]
+  },
+  {
+    "id": "c-sample-2",
+    "docName": "PaymentGateway_Service_Agreement.pdf",
+    "vendorName": "PaymentGateway",
+    "uploadDate": "2026-06-10",
+    "aiReviewStatus": "Passed with Warnings",
+    "overallRisk": "Moderate",
+    "clauses": [
+      {
+        "clauseText": "Section 4.1: Target SLA availability is set to 99.5% computed monthly.",
+        "riskSeverity": "Moderate",
+        "riskExplanation": "99.5% SLA permits over 3.6 hours of outage per month for payment processing.",
+        "recommendedFix": "Renegotiate uptime target to 99.99% with service credits for SLA breaches."
+      }
+    ]
+  }
+]
