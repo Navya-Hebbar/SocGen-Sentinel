@@ -162,7 +162,7 @@ export default function Welcome({ onEnterPortal }) {
   ];
 
   return (
-    <div className="h-screen w-screen bg-slate-950 flex flex-col relative overflow-hidden select-none text-slate-200">
+    <div className="min-h-screen w-screen bg-slate-950 flex flex-col relative overflow-y-auto select-none text-slate-200">
       
       {/* Background Tech Loop Video - HIGH VISIBILITY */}
       <video
@@ -170,22 +170,22 @@ export default function Welcome({ onEnterPortal }) {
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-screen pointer-events-none"
+        className="fixed inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-screen pointer-events-none"
       >
         <source src="/cyber_bg.mp4" type="video/mp4" />
       </video>
 
       {/* Massive Glowing Orbs for stunning backdrop */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/20 rounded-full blur-[150px] pointer-events-none z-0"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
+      <div className="fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/20 rounded-full blur-[150px] pointer-events-none z-0"></div>
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
       {/* Cyber Grid Overlay */}
-      <div className="absolute inset-0 cyber-grid opacity-20 pointer-events-none z-0 mix-blend-overlay"></div>
+      <div className="fixed inset-0 cyber-grid opacity-20 pointer-events-none z-0 mix-blend-overlay"></div>
 
       {/* Interactive HTML5 Canvas Plexus Animation */}
       <canvas 
         ref={canvasRef} 
-        className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-80 mix-blend-screen" 
+        className="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-80 mix-blend-screen" 
       />
 
       {/* Top Navbar */}
@@ -208,11 +208,11 @@ export default function Welcome({ onEnterPortal }) {
         </div>
       </header>
 
-      {/* Main Container - Strictly flexed to prevent scrolling */}
-      <main className="flex-1 z-10 flex flex-col justify-between w-full max-w-7xl mx-auto px-6 py-6 h-full">
+      {/* Main Container - Allows scrolling if content exceeds height */}
+      <main className="flex-1 z-10 flex flex-col justify-between w-full max-w-7xl mx-auto px-6 py-6 gap-8">
         
         {/* Top Half: Massive Hero Area */}
-        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-5">
+        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-5 py-6 md:py-10">
           
           <motion.div
             initial={{ opacity: 0, y: 20 }}

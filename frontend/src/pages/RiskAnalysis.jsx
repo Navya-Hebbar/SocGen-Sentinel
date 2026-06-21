@@ -13,6 +13,9 @@ import {
   Play
 } from "lucide-react";
 
+// Import API Helpers
+import { remediateVendor } from "../utils/api";
+
 export default function RiskAnalysis({ vendors, setVendors, setNotifications }) {
   const [selectedVendorId, setSelectedVendorId] = useState(vendors[0]?.id || "");
   const [vendor, setVendor] = useState(null);
@@ -79,45 +82,58 @@ export default function RiskAnalysis({ vendors, setVendors, setNotifications }) 
     return { label: "Low", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" };
   };
 
-  const handleApplyRemediation = () => {
+  const handleApplyRemediation = async () => {
     if (!vendor) return;
 
-    // Update vendor in database list
-    const simLevel = getSimulatedRiskLevel(simulatedScore).label;
+    // Call backend API
+    const res = await remediateVendor(vendor.id, controls);
     
-    const updatedVendors = vendors.map(v => {
-      if (v.id === vendor.id) {
-        return {
-          ...v,
-          riskScore: simulatedScore,
-          riskLevel: simLevel,
-          // Update compliance statuses if audited/encrypted
-          complianceStatus: {
-            ...v.complianceStatus,
-            SOC2: controls.soc2Completed ? "Compliant" : v.complianceStatus.SOC2,
-            ISO27001: controls.encryptionEnabled ? "Compliant" : v.complianceStatus.ISO27001
-          },
-          // Adjust subprocessors count if restricted
-          subprocessors: controls.subprocessorRestricted ? Math.min(v.subprocessors, 8) : v.subprocessors,
-          activeBreaches: simulatedScore < 50 ? 0 : v.activeBreaches
-        };
-      }
-      return v;
-    });
+    if (res && res.id) {
+      // Update state with updated vendor from backend
+      const updatedVendors = vendors.map(v => v.id === vendor.id ? res : v);
+      setVendors(updatedVendors);
+      
+      const alertId = `rem-${Date.now()}`;
+      const newAlert = {
+        id: alertId,
+        vendorName: vendor.name,
+        type: "success",
+        content: `AI Remediation applied successfully. ML Score reduced to ${res.riskScore} (${res.riskLevel} Risk).`,
+        timestamp: "Just now"
+      };
+      setNotifications(prev => [newAlert, ...prev]);
+    } else {
+      // Fallback local update
+      const simLevel = getSimulatedRiskLevel(simulatedScore).label;
+      const updatedVendors = vendors.map(v => {
+        if (v.id === vendor.id) {
+          return {
+            ...v,
+            riskScore: simulatedScore,
+            riskLevel: simLevel,
+            complianceStatus: {
+              ...v.complianceStatus,
+              SOC2: controls.soc2Completed ? "Compliant" : v.complianceStatus.SOC2,
+              ISO27001: controls.encryptionEnabled ? "Compliant" : v.complianceStatus.ISO27001
+            },
+            subprocessors: controls.subprocessorRestricted ? Math.min(v.subprocessors, 8) : v.subprocessors,
+            activeBreaches: simulatedScore < 50 ? 0 : v.activeBreaches
+          };
+        }
+        return v;
+      });
+      setVendors(updatedVendors);
 
-    setVendors(updatedVendors);
-
-    // Create system notification
-    const alertId = `rem-${Date.now()}`;
-    const newAlert = {
-      id: alertId,
-      vendorName: vendor.name,
-      type: "success",
-      content: `AI Remediation applied successfully. Score reduced to ${simulatedScore} (${simLevel} Risk).`,
-      timestamp: "Just now"
-    };
-
-    setNotifications(prev => [newAlert, ...prev]);
+      const alertId = `rem-${Date.now()}`;
+      const newAlert = {
+        id: alertId,
+        vendorName: vendor.name,
+        type: "success",
+        content: `AI Remediation applied successfully. Score reduced to ${simulatedScore} (${simLevel} Risk).`,
+        timestamp: "Just now"
+      };
+      setNotifications(prev => [newAlert, ...prev]);
+    }
   };
 
   const simRisk = getSimulatedRiskLevel(simulatedScore);

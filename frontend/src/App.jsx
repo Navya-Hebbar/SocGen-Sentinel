@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 
+// Import API Helpers
+import { fetchVendors, fetchContracts, fetchComplianceSummary, fetchBreachFeed } from "./utils/api";
+
 // Import Pages
 import DashboardHome from "./pages/DashboardHome";
 import Vendors from "./pages/Vendors";
@@ -10,6 +13,9 @@ import RiskAnalysis from "./pages/RiskAnalysis";
 import Compliance from "./pages/Compliance";
 import ContractAI from "./pages/ContractAI";
 import Welcome from "./pages/Welcome";
+import FutureRisk from "./pages/FutureRisk";
+import BreachMonitor from "./pages/BreachMonitor";
+import AuditReport from "./pages/AuditReport";
 
 export default function App() {
   // Navigation & Shell States
@@ -25,20 +31,20 @@ export default function App() {
   const [contracts, setContracts] = useState([]);
   const [complianceStandards, setComplianceStandards] = useState({});
 
-  // Load all dashboard states dynamically from JSON
+  // Load all dashboard states dynamically from Backend or fallback JSON
   React.useEffect(() => {
-    fetch("/data.json")
-      .then(res => res.json())
-      .then(data => {
-        if (data.vendors) {
-          setVendors(data.vendors);
+    async function loadAllData() {
+      try {
+        const backendVendors = await fetchVendors();
+        if (backendVendors && backendVendors.length > 0) {
+          setVendors(backendVendors);
           
-          // Generate expiry alerts dynamically from vendor certifications status
+          // Generate expiry alerts dynamically
           const alerts = [];
-          data.vendors.forEach(v => {
+          backendVendors.forEach(v => {
             if (v.certifications) {
               v.certifications.forEach(c => {
-                if (c.status === "Expired") {
+                if (c.status === "Expired" || c.status === "Non-Compliant") {
                   alerts.push({
                     id: `exp-${v.id}-${c.name}`,
                     vendorName: v.name,
@@ -51,19 +57,100 @@ export default function App() {
             }
           });
           setExpiryAlerts(alerts);
+          
+          // Fetch contracts from backend
+          const backendContracts = await fetchContracts();
+          if (backendContracts) setContracts(backendContracts);
+          
+          // Fetch compliance standards fallback
+          const defaultCompliance = {
+            "SOC2": [
+              {"id": "req-s1", "name": "CC6.1 - Logical Access Control", "desc": "MFA, SSO, and endpoint protection must be active for all staff."},
+              {"id": "req-s2", "name": "CC6.3 - Perimeter Defenses", "desc": "Vulnerability scanners and firewall rules must be reviewed monthly."},
+              {"id": "req-s3", "name": "CC7.1 - Vulnerability Management", "desc": "Pen tests annually; critical findings patched within 30 days."}
+            ],
+            "ISO27001": [
+              {"id": "req-i1", "name": "A.9.2 - User Access Mgmt", "desc": "Formal authorization process for privileged developer roles."},
+              {"id": "req-i2", "name": "A.12.6 - Tech Vulnerabilities", "desc": "Patches cataloged and deployed systematically by security level."},
+              {"id": "req-i3", "name": "A.10.1 - Cryptographic Controls", "desc": "Sensitive data encrypted at rest and in transit."}
+            ],
+            "GDPR": [
+              {"id": "req-g1", "name": "Article 32 - Security of Processing", "desc": "Pseudo-anonymization and log auditing on user database assets."},
+              {"id": "req-g2", "name": "Article 28 - Subprocessor Agreements", "desc": "Contracts must declare all downstream subprocessors."},
+              {"id": "req-g3", "name": "Article 33 - Breach Notification", "desc": "Client notification within 72 hours of security incidents."}
+            ]
+          };
+          setComplianceStandards(defaultCompliance);
+          
+          // Fetch recent activities from global feed
+          const feedRes = await fetchBreachFeed();
+          if (feedRes && feedRes.feed) {
+            const activities = feedRes.feed.map(item => ({
+              id: item.id,
+              vendorName: item.vendor_match || "Security Intelligence Feed",
+              type: item.severity === "Critical" ? "breach" : "compliance",
+              content: item.title,
+              timestamp: item.date || "Recent"
+            }));
+            setRecentActivities(activities);
+            setNotifications(activities.slice(0, 3));
+          } else {
+            // fallback recent activities
+            const fallbackActs = backendVendors.slice(0, 5).map(v => ({
+              id: `act-${v.id}`,
+              vendorName: v.name,
+              type: v.breachStatus ? "breach" : "compliance",
+              content: v.riskFactors[0] || "Routine audit review complete",
+              timestamp: "Recent"
+            }));
+            setRecentActivities(fallbackActs);
+            setNotifications(fallbackActs.slice(0, 3));
+          }
+          return;
         }
-        if (data.recentActivities) {
-          setRecentActivities(data.recentActivities);
-          setNotifications(data.recentActivities.slice(0, 3));
-        }
-        if (data.contracts) {
-          setContracts(data.contracts);
-        }
-        if (data.complianceStandards) {
-          setComplianceStandards(data.complianceStandards);
-        }
-      })
-      .catch(err => console.error("Error loading dynamic data:", err));
+      } catch (err) {
+        console.warn("Backend unavailable, falling back to static data.json", err);
+      }
+      
+      // Fallback to static data.json
+      fetch("/data.json")
+        .then(res => res.json())
+        .then(data => {
+          if (data.vendors) {
+            setVendors(data.vendors);
+            const alerts = [];
+            data.vendors.forEach(v => {
+              if (v.certifications) {
+                v.certifications.forEach(c => {
+                  if (c.status === "Expired") {
+                    alerts.push({
+                      id: `exp-${v.id}-${c.name}`,
+                      vendorName: v.name,
+                      certName: c.name,
+                      status: "expired",
+                      expiryDate: c.expiryDate
+                    });
+                  }
+                });
+              }
+            });
+            setExpiryAlerts(alerts);
+          }
+          if (data.recentActivities) {
+            setRecentActivities(data.recentActivities);
+            setNotifications(data.recentActivities.slice(0, 3));
+          }
+          if (data.contracts) {
+            setContracts(data.contracts);
+          }
+          if (data.complianceStandards) {
+            setComplianceStandards(data.complianceStandards);
+          }
+        })
+        .catch(err => console.error("Error loading dynamic data:", err));
+    }
+    
+    loadAllData();
   }, []);
 
   // Calculate dynamic Threat Level
@@ -104,6 +191,12 @@ export default function App() {
         return "url('/cyber_compliance_bg.png')";
       case "contractAI":
         return "url('/cyber_contract_bg.png')";
+      case "futureRisk":
+        return "url('/cyber_risk_bg.png')";
+      case "breachMonitor":
+        return "url('/cyber_sentinel_bg.png')";
+      case "auditReport":
+        return "url('/cyber_compliance_bg.png')";
       default:
         return "url('/cyber_sentinel_bg.png')";
     }
@@ -153,6 +246,22 @@ export default function App() {
       case "contractAI":
         return (
           <ContractAI contracts={contracts} setContracts={setContracts} />
+        );
+      case "futureRisk":
+        return (
+          <FutureRisk 
+            vendors={vendors}
+            setActiveTab={setActiveTab}
+            setSelectedVendor={setSelectedVendor}
+          />
+        );
+      case "breachMonitor":
+        return (
+          <BreachMonitor vendors={vendors} />
+        );
+      case "auditReport":
+        return (
+          <AuditReport vendors={vendors} />
         );
       default:
         return (

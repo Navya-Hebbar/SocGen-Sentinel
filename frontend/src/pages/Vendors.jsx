@@ -11,8 +11,15 @@ import {
   FileCheck,
   ShieldCheck,
   AlertOctagon,
-  Trash2
+  Trash2,
+  Activity,
+  Calendar,
+  DollarSign
 } from "lucide-react";
+
+// Import API Helpers
+import { createVendor, deleteVendor } from "../utils/api";
+import ProductionBanner from "../components/ProductionBanner";
 
 export default function Vendors({ 
   vendors, 
@@ -42,51 +49,70 @@ export default function Vendors({
   });
 
   // Handle adding vendor
-  const handleAddVendorSubmit = (e) => {
+  const handleAddVendorSubmit = async (e) => {
     e.preventDefault();
     if (!newVendor.name || !newVendor.industry) return;
 
-    const score = parseInt(newVendor.riskScore);
-    let level = "Low";
-    if (score > 80) level = "Critical";
-    else if (score > 60) level = "High";
-    else if (score > 40) level = "Medium";
-
-    // Auto-generate risk factors based on compliance & score
-    const factors = [];
-    if (newVendor.SOC2 !== "Compliant") factors.push("Expiring SOC2 certification");
-    if (newVendor.GDPR !== "Compliant") factors.push("Missing GDPR agreement");
-    if (score > 70) factors.push("Recent breach vector suspected");
-    if (score > 50) factors.push("High sensitivity customer PII data access");
-    if (factors.length === 0) factors.push("Pending routine security check");
-
-    const vendorObj = {
-      id: `v-${vendors.length + 1}`,
+    // Call backend API
+    const res = await createVendor({
       name: newVendor.name,
       industry: newVendor.industry,
       description: newVendor.description || "Vendor assessment review in progress.",
-      riskScore: score,
-      riskLevel: level,
-      complianceStatus: {
-        SOC2: newVendor.SOC2,
-        GDPR: newVendor.GDPR,
-        ISO27001: newVendor.ISO27001
-      },
-      activeBreaches: score > 80 ? 1 : 0,
-      riskFactors: factors,
-      certifications: [
-        { name: "SOC 2 Type II", status: newVendor.SOC2, expiryDate: "2027-06-30" },
-        { name: "ISO 27001", status: newVendor.ISO27001, expiryDate: "2027-08-30" }
-      ],
-      contacts: {
-        name: newVendor.contactName || "Security Operations",
-        email: newVendor.contactEmail || `sec-ops@${newVendor.name.toLowerCase().replace(/\s+/g, "")}.com`
-      },
+      riskScore: parseInt(newVendor.riskScore),
+      SOC2: newVendor.SOC2,
+      GDPR: newVendor.GDPR,
+      ISO27001: newVendor.ISO27001,
       subprocessors: parseInt(newVendor.subprocessors) || 0,
-      dataAssetsShared: newVendor.dataAssetsShared || "Standard Public Marketing Assets"
-    };
+      dataAssetsShared: newVendor.dataAssetsShared || "Standard Public Marketing Assets",
+      contactName: newVendor.contactName || "Security Operations",
+      contactEmail: newVendor.contactEmail || `sec-ops@${newVendor.name.toLowerCase().replace(/\s+/g, "")}.com`
+    });
 
-    setVendors([vendorObj, ...vendors]);
+    if (res && res.id) {
+      setVendors([res, ...vendors]);
+    } else {
+      // Local fallback if backend is offline
+      const score = parseInt(newVendor.riskScore);
+      let level = "Low";
+      if (score > 80) level = "Critical";
+      else if (score > 60) level = "High";
+      else if (score > 40) level = "Medium";
+
+      const factors = [];
+      if (newVendor.SOC2 !== "Compliant") factors.push("Expiring SOC2 certification");
+      if (newVendor.GDPR !== "Compliant") factors.push("Missing GDPR agreement");
+      if (score > 70) factors.push("Recent breach vector suspected");
+      if (score > 50) factors.push("High sensitivity customer PII data access");
+      if (factors.length === 0) factors.push("Pending routine security check");
+
+      const vendorObj = {
+        id: `v-${vendors.length + 1}`,
+        name: newVendor.name,
+        industry: newVendor.industry,
+        description: newVendor.description || "Vendor assessment review in progress.",
+        riskScore: score,
+        riskLevel: level,
+        complianceStatus: {
+          SOC2: newVendor.SOC2,
+          GDPR: newVendor.GDPR,
+          ISO27001: newVendor.ISO27001
+        },
+        activeBreaches: score > 80 ? 1 : 0,
+        riskFactors: factors,
+        certifications: [
+          { name: "SOC 2 Type II", status: newVendor.SOC2, expiryDate: "2027-06-30" },
+          { name: "ISO 27001", status: newVendor.ISO27001, expiryDate: "2027-08-30" }
+        ],
+        contacts: {
+          name: newVendor.contactName || "Security Operations",
+          email: newVendor.contactEmail || `sec-ops@${newVendor.name.toLowerCase().replace(/\s+/g, "")}.com`
+        },
+        subprocessors: parseInt(newVendor.subprocessors) || 0,
+        dataAssetsShared: newVendor.dataAssetsShared || "Standard Public Marketing Assets"
+      };
+      setVendors([vendorObj, ...vendors]);
+    }
+
     setShowAddModal(false);
     
     // Reset form
@@ -106,9 +132,14 @@ export default function Vendors({
   };
 
   // Delete vendor
-  const handleDeleteVendor = (id, e) => {
+  const handleDeleteVendor = async (id, e) => {
     e.stopPropagation();
+    
+    // Call backend API
+    const res = await deleteVendor(id);
+    // Remove locally anyway (optimistic delete)
     setVendors(vendors.filter(v => v.id !== id));
+    
     if (selectedVendor && selectedVendor.id === id) {
       setSelectedVendor(null);
     }
@@ -195,6 +226,11 @@ export default function Vendors({
           </button>
         </div>
       )}
+
+      <ProductionBanner 
+        title="Production Deployment: Vendor Risk Evaluation Engine" 
+        description="Register real enterprise vendors here. The backend XGBoost Machine Learning model will immediately cross-reference their data access level, compliance posture, and financial spend to compute a real-time Risk Severity matrix."
+      />
 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">

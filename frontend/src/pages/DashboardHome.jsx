@@ -24,6 +24,8 @@ import {
   FileCheck,
   AlertOctagon
 } from "lucide-react";
+import ProductionBanner from "../components/ProductionBanner";
+
 // Dynamic Data Aggregators
 const getRiskDistributionData = (vendors) => {
   const counts = { Low: 0, Medium: 0, High: 0, Critical: 0 };
@@ -140,6 +142,11 @@ export default function DashboardHome({
           <span className="text-xs text-emerald-400 font-semibold tracking-wider uppercase font-mono">Ecosystem Shield Active</span>
         </div>
       </div>
+
+      <ProductionBanner 
+        title="Production Deployment: Continuous Threat Surveillance" 
+        description="This dashboard aggregates real-time metrics across your live enterprise environment. It automatically evaluates the overall Ecosystem Shield Index based on active SOC2/ISO certificates, CISA KEV vulnerability cross-references, and Gemini 2.0 AI contract risk analysis."
+      />
 
       {vendors.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-12 text-center glass-panel rounded-2xl max-w-xl mx-auto space-y-6 relative overflow-hidden my-12">

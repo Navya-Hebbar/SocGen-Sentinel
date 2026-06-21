@@ -23,6 +23,9 @@ export default function Navbar({ activeTab, notifications, setNotifications, thr
       case "contractAI": return "Contract Intelligence / AI Parser";
       case "reports": return "Intelligence Reports / Custom Generator";
       case "settings": return "System Control / Policy Settings";
+      case "futureRisk": return "Future Risk Prediction / ML Trajectory Forecasting";
+      case "breachMonitor": return "Threat Intelligence / Vendor Breach Feed";
+      case "auditReport": return "Intelligence Reports / Executive Audit Report";
       default: return "Sentinel Gateway";
     }
   };

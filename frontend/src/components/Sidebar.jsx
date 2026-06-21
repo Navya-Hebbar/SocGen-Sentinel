@@ -13,16 +13,22 @@ import {
   Database,
   Lock,
   UserCheck,
-  LogOut
+  LogOut,
+  TrendingUp,
+  Radio,
+  ClipboardCheck
 } from "lucide-react";
 
 export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed, onSignOut }) {
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, section: "Intelligence" },
     { id: "vendors", label: "Vendors", icon: Users },
     { id: "riskAnalysis", label: "Risk Analysis", icon: Activity },
-    { id: "compliance", label: "Compliance", icon: FileCheck },
+    { id: "futureRisk", label: "Future Risk", icon: TrendingUp, section: "Monitoring" },
+    { id: "breachMonitor", label: "Breach Monitor", icon: Radio },
+    { id: "compliance", label: "Compliance", icon: FileCheck, section: "Governance" },
     { id: "contractAI", label: "Contract AI", icon: Database },
+    { id: "auditReport", label: "Audit Report", icon: ClipboardCheck },
   ];
 
   return (
@@ -72,38 +78,49 @@ export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollaps
         )}
 
         {/* Menu Items */}
-        <nav className="mt-4 px-2 space-y-1">
+        <nav className="mt-4 px-2 space-y-0.5">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             
             return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all group relative ${
-                  isActive 
-                    ? "bg-blue-600/10 text-white border-l-2 border-blue-500 shadow-[inset_4px_0_12px_rgba(59,130,246,0.05)]" 
-                    : "hover:bg-slate-900/60 hover:text-white text-slate-400"
-                }`}
-              >
-                <Icon className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 ${isActive ? "text-blue-500" : "text-slate-400 group-hover:text-blue-400"}`} />
-                {!collapsed && (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {item.label}
-                  </motion.span>
-                )}
-                {/* Tooltip for collapsed sidebar */}
-                {collapsed && (
-                  <div className="absolute left-full ml-4 px-2 py-1 bg-slate-950 border border-slate-800 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity whitespace-nowrap z-50 shadow-xl">
-                    {item.label}
+              <React.Fragment key={item.id}>
+                {/* Section divider */}
+                {item.section && !collapsed && (
+                  <div className="pt-3 pb-1 px-3 first:pt-0">
+                    <span className="text-[8px] text-slate-600 uppercase tracking-[0.2em] font-bold">{item.section}</span>
                   </div>
                 )}
-              </button>
+                {item.section && collapsed && (
+                  <div className="pt-2 pb-1">
+                    <div className="h-px bg-slate-900 mx-3"></div>
+                  </div>
+                )}
+                <button
+                  onClick={() => setActiveTab(item.id)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all group relative ${
+                    isActive 
+                      ? "bg-blue-600/10 text-white border-l-2 border-blue-500 shadow-[inset_4px_0_12px_rgba(59,130,246,0.05)]" 
+                      : "hover:bg-slate-900/60 hover:text-white text-slate-400"
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 ${isActive ? "text-blue-500" : "text-slate-400 group-hover:text-blue-400"}`} />
+                  {!collapsed && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                  {collapsed && (
+                    <div className="absolute left-full ml-4 px-2 py-1 bg-slate-950 border border-slate-800 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity whitespace-nowrap z-50 shadow-xl">
+                      {item.label}
+                    </div>
+                  )}
+                </button>
+              </React.Fragment>
             );
           })}
         </nav>
