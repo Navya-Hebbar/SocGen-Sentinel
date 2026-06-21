@@ -109,19 +109,31 @@ Visit `http://localhost:5173` to access the Sentinel Dashboard.
 Below are the high-fidelity user interface screens generated dynamically via localhost:
 
 ### 1. The Global Intelligence Dashboard
-![Dashboard](screenshot_1_dashboard.png)
+![Dashboard](screenshots/screenshot_1_dashboard.png)
 
 ### 2. Centralized Vendor Registry
-![Vendors](screenshot_2_vendors.png)
+![Vendors](screenshots/screenshot_2_vendors.png)
 
 ### 3. Interactive Risk Analysis Sandbox
-![Risk Analysis](screenshot_3_risk_analysis.png)
+![Risk Analysis](screenshots/screenshot_3_risk_analysis.png)
 
 ### 4. ML-Powered Future Risk Trajectories
-![Future Risk](screenshot_4_future_risk.png)
+![Future Risk](screenshots/screenshot_4_future_risk.png)
 
 ### 5. Live Threat Intelligence & Breach Monitor
-![Breach Monitor](screenshot_5_breach_monitor.png)
+![Breach Monitor](screenshots/screenshot_5_breach_monitor.png)
+
+### 6. Compliance Alignment Matrix
+![Compliance Matrix](screenshots/screenshot_6_compliance_matrix.png)
+
+### 7. Contract AI NLP Intelligence
+![Contract AI](screenshots/screenshot_7_contract_ai.png)
+
+### 8. Executive Audit Report Dashboard
+![Audit Report](screenshots/screenshot_8_audit_report.png)
+
+### 9. Exported Print-Ready PDF
+![Audit PDF](screenshots/screenshot_9_audit_pdf.png)
 
 ---
 *Developed for the Societe Generale Hackathon.*
