@@ -1,46 +1,66 @@
-# Dependencies
+# ─── Node / Frontend ───────────────────────────────
 node_modules/
+dist/
+build/
+out/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
 
-# Environment variables
+# ─── Environment Variables ──────────────────────────
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Logs
+# ─── Logs ───────────────────────────────────────────
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Build folders
-dist/
-build/
-out/
-
-# Cache
-.cache/
-.parcel-cache/
-.next/
-.nuxt/
-
-# OS files
+# ─── OS / IDE ───────────────────────────────────────
 .DS_Store
 Thumbs.db
-
-# IDE files
 .vscode/
 .idea/
+Thumbs.db
 
-# Coverage reports
+# ─── Python ─────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+
+# ─── ML / Pickle (large binary — keep in repo but don't re-add if deleted) ──
+# backend/ml/*.pkl   ← uncomment to exclude models from git
+
+# ─── Dev / Scratch Scripts ─────────────────────────
+backend/eval_model.py
+backend/test_model.py
+backend/ml/seed_real_vendors.py
+
+# ─── Old Screenshots (outdated after redesign) ─────
+screenshots/
+
+# ─── Root-level duplicate data files ────────────────
+# Canonical copies live in backend/ml/ — root copies are redundant
+vendor_registry.csv
+vendor_labels.csv
+
+# ─── Miscellaneous junk ─────────────────────────────
+AcmeCorp_HighRisk_SLA.txt
+GRC_Hackathon_Problem_Statements.docx
+"README copy.md"
 coverage/
-
-# Temporary files
 tmp/
 temp/
-
-# Package lock files (optional)
-# package-lock.json
-# yarn.lock

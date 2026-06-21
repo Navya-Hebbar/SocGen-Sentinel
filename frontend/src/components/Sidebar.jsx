@@ -1,140 +1,150 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  ShieldAlert, 
-  LayoutDashboard, 
-  Users, 
-  Activity, 
-  FileCheck, 
-  FileText, 
-  Sliders, 
-  ChevronLeft, 
-  ChevronRight,
-  Database,
-  Lock,
-  UserCheck,
-  LogOut,
-  TrendingUp,
-  Radio,
-  ClipboardCheck
+import {
+  ShieldAlert, LayoutDashboard, Users, Activity, FileCheck,
+  Database, ChevronLeft, ChevronRight, LogOut, TrendingUp, Radio, ClipboardCheck, Cpu
 } from "lucide-react";
 
+const sections = [
+  {
+    label: "Intelligence",
+    items: [
+      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { id: "vendors", label: "Vendors", icon: Users },
+      { id: "riskAnalysis", label: "Risk Analysis", icon: Activity },
+    ]
+  },
+  {
+    label: "Monitoring",
+    items: [
+      { id: "futureRisk", label: "Future Risk", icon: TrendingUp },
+      { id: "breachMonitor", label: "Breach Monitor", icon: Radio },
+    ]
+  },
+  {
+    label: "Governance",
+    items: [
+      { id: "compliance", label: "Compliance", icon: FileCheck },
+      { id: "contractAI", label: "Contract AI", icon: Database },
+      { id: "auditReport", label: "Audit Report", icon: ClipboardCheck },
+    ]
+  }
+];
+
 export default function Sidebar({ activeTab, setActiveTab, collapsed, setCollapsed, onSignOut }) {
-  const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, section: "Intelligence" },
-    { id: "vendors", label: "Vendors", icon: Users },
-    { id: "riskAnalysis", label: "Risk Analysis", icon: Activity },
-    { id: "futureRisk", label: "Future Risk", icon: TrendingUp, section: "Monitoring" },
-    { id: "breachMonitor", label: "Breach Monitor", icon: Radio },
-    { id: "compliance", label: "Compliance", icon: FileCheck, section: "Governance" },
-    { id: "contractAI", label: "Contract AI", icon: Database },
-    { id: "auditReport", label: "Audit Report", icon: ClipboardCheck },
-  ];
-
   return (
-    <motion.div
-      animate={{ width: collapsed ? 76 : 260 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="print:hidden h-screen sticky top-0 left-0 bg-black/40 backdrop-blur-md border-r border-white/10 flex flex-col justify-between z-30 select-none text-zinc-400"
-    >
-      <div>
-        {/* Logo Section */}
-        <div className="flex items-center justify-between p-4 h-16 border-b border-white/10">
-          {!collapsed ? (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
-              className="flex items-center gap-2"
-            >
-              <ShieldAlert className="w-6 h-6 text-blue-500" />
-              <span className="font-display font-bold text-lg text-white tracking-wider">
-                SOCGEN <span className="text-blue-500">SENTINEL</span>
-              </span>
-            </motion.div>
-          ) : (
-            <div className="mx-auto">
-              <ShieldAlert className="w-6 h-6 text-blue-500" />
-            </div>
-          )}
+    <motion.aside
+      animate={{ width: collapsed ? 68 : 250 }}
+      transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
+      className="print:hidden h-screen sticky top-0 left-0 flex flex-col z-30 select-none overflow-hidden flex-shrink-0"
+      style={{
+        background: "rgba(3, 4, 13, 0.92)",
+        backdropFilter: "blur(28px) saturate(200%)",
+        WebkitBackdropFilter: "blur(28px) saturate(200%)",
+        borderRight: "1px solid rgba(255,255,255,0.05)",
+      }}>
 
-          <button 
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-1 rounded-md bg-[#18181b] border border-[#27272a] text-zinc-400 hover:text-white hover:border-blue-500/50 transition-colors"
-          >
-            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
-        </div>
+      {/* Subtle top glow line */}
+      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.5), rgba(6,182,212,0.3), transparent)" }} />
 
-        {/* Threat Banner */}
+      {/* Logo */}
+      <div className="flex items-center justify-between px-3.5 h-[60px] flex-shrink-0"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
         {!collapsed && (
-          <div className="m-3 p-3 rounded-lg bg-blue-950/20 border border-blue-900/30 flex items-center gap-2 text-xs">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="text-zinc-400">System Active: Secure</span>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+            className="flex items-center gap-2.5">
+            <div className="relative flex-shrink-0">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{ background: "linear-gradient(135deg, #4f46e5, #06b6d4)", boxShadow: "0 0 20px rgba(79,70,229,0.45)" }}>
+                <ShieldAlert className="w-4 h-4 text-white" />
+              </div>
+            </div>
+            <div className="leading-tight">
+              <span className="font-display font-bold text-[13px] text-white tracking-wide">SocGen</span>
+              <span className="font-display font-bold text-[13px] tracking-wide" style={{ color: "#22d3ee" }}> Sentinel</span>
+            </div>
+          </motion.div>
+        )}
+        {collapsed && (
+          <div className="mx-auto w-8 h-8 rounded-xl flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg, #4f46e5, #06b6d4)", boxShadow: "0 0 16px rgba(79,70,229,0.4)" }}>
+            <ShieldAlert className="w-4 h-4 text-white" />
           </div>
         )}
+        {!collapsed && (
+          <button onClick={() => setCollapsed(!collapsed)}
+            className="ml-auto p-1.5 rounded-lg transition-all flex-shrink-0"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", color: "#94a3b8" }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#a5b4fc"; e.currentTarget.style.borderColor = "rgba(99,102,241,0.3)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}>
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
 
-        {/* Menu Items */}
-        <nav className="mt-4 px-2 space-y-0.5">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            
-            return (
-              <React.Fragment key={item.id}>
-                {/* Section divider */}
-                {item.section && !collapsed && (
-                  <div className="pt-3 pb-1 px-3 first:pt-0">
-                    <span className="text-[8px] text-slate-600 uppercase tracking-[0.2em] font-bold">{item.section}</span>
-                  </div>
-                )}
-                {item.section && collapsed && (
-                  <div className="pt-2 pb-1">
-                    <div className="h-px bg-[#27272a] mx-3"></div>
-                  </div>
-                )}
-                <button
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-2.5 pt-3 pb-2 space-y-0">
+        {sections.map((section, si) => (
+          <div key={section.label}>
+            {!collapsed && (
+              <div className="px-2 pt-4 pb-1.5 first:pt-2">
+                <span className="section-label">{section.label}</span>
+              </div>
+            )}
+            {collapsed && si > 0 && <div className="my-2.5" style={{ height: "1px", background: "rgba(255,255,255,0.04)" }} />}
+            {section.items.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <motion.button
+                  key={item.id}
+                  id={`nav-${item.id}`}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all group relative ${
-                    isActive 
-                      ? "bg-blue-600/10 text-white border-l-2 border-blue-500" 
-                      : "hover:bg-[#18181b] hover:text-white text-zinc-400"
-                  }`}
-                >
-                  <Icon className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 ${isActive ? "text-blue-500" : "text-zinc-500 group-hover:text-blue-400"}`} />
+                  whileHover={{ x: collapsed ? 0 : 2 }}
+                  transition={{ duration: 0.15 }}
+                  className={`nav-item ${isActive ? "active" : ""} mb-0.5`}
+                  title={collapsed ? item.label : undefined}>
+                  <div className="nav-active-bar" />
+                  <Icon className={`nav-icon w-4 h-4 flex-shrink-0 ${isActive ? "" : "text-slate-400"}`} />
                   {!collapsed && (
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {item.label}
-                    </motion.span>
+                    <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}
+                      className="text-[13px]">{item.label}</motion.span>
                   )}
+                  {/* Collapsed tooltip */}
                   {collapsed && (
-                      <div className="absolute left-full ml-4 px-2 py-1 bg-[#18181b] border border-[#27272a] text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity whitespace-nowrap z-50 shadow-xl">
+                    <div className="absolute left-full ml-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-white whitespace-nowrap z-50 opacity-0 group-hover:opacity-100 pointer-events-none transition-all"
+                      style={{ background: "rgba(4,6,18,0.98)", border: "1px solid rgba(99,102,241,0.2)", boxShadow: "0 10px 30px rgba(0,0,0,0.6)" }}>
                       {item.label}
                     </div>
                   )}
-                </button>
-              </React.Fragment>
-            );
-          })}
-        </nav>
-      </div>
-      {/* Sign Out Button */}
-      <div className="p-3 border-t border-white/10 mt-auto">
+                </motion.button>
+              );
+            })}
+          </div>
+        ))}
+      </nav>
+
+      {/* Bottom: collapse toggle + sign out */}
+      <div className="flex-shrink-0 p-2.5 space-y-1" style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+        {collapsed && (
+          <button onClick={() => setCollapsed(false)}
+            className="w-full flex items-center justify-center p-2.5 rounded-xl transition-all"
+            style={{ color: "#94a3b8" }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#a5b4fc"; e.currentTarget.style.background = "rgba(99,102,241,0.08)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; }}>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
         <button
           onClick={onSignOut}
-          className="w-full flex items-center gap-3 p-2.5 rounded-lg text-xs font-semibold text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group cursor-pointer"
-        >
-          <LogOut className="w-4 h-4 text-zinc-500 group-hover:text-red-400 transition-colors" />
-          {!collapsed && <span className="uppercase tracking-wider">Sign Out</span>}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[11px] font-semibold uppercase tracking-widest transition-all"
+          style={{ color: "#94a3b8", fontFamily: "var(--font-mono)" }}
+          onMouseEnter={e => { e.currentTarget.style.color = "#fb7185"; e.currentTarget.style.background = "rgba(244,63,94,0.07)"; }}
+          onMouseLeave={e => { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; }}>
+          <LogOut className="w-4 h-4 flex-shrink-0" />
+          {!collapsed && <span>Sign Out</span>}
         </button>
       </div>
-    </motion.div>
+    </motion.aside>
   );
 }

@@ -1,5 +1,33 @@
 [
   {
+    "id": "c-1782027042",
+    "docName": "AcmeCorp_HighRisk_SLA.txt",
+    "vendorName": "Acmecorp Highrisk Sla.Txt",
+    "uploadDate": "2026-06-21",
+    "aiReviewStatus": "Flagged",
+    "overallRisk": "Critical",
+    "clauses": [
+      {
+        "clauseText": "Section 11.2: Vendor liability for data breaches is limited to fees paid in the preceding 3 months.",
+        "riskSeverity": "Critical",
+        "riskExplanation": "Extremely low liability cap fails to protect against costly breach notification, forensics, and regulatory fine exposure that can exceed $10M.",
+        "recommendedFix": "Renegotiate to exclude cyber and data breach events from the general limitation of liability. Set a minimum floor of $5,000,000 for data breach indemnification."
+      },
+      {
+        "clauseText": "Section 8.4: Service Provider may utilize subprocessors without prior written consent, subject to maintaining equivalent security controls.",
+        "riskSeverity": "Critical",
+        "riskExplanation": "Lack of prior consent mechanism for subprocessor engagement violates GDPR Article 28(2) and increases supply chain attack surface.",
+        "recommendedFix": "Require 30-day prior written notification and right to object for any new subprocessor. Maintain an auditable subprocessor registry."
+      },
+      {
+        "clauseText": "Section 15.3: Either party may terminate without cause upon 60 days written notice.",
+        "riskSeverity": "Moderate",
+        "riskExplanation": "60-day termination window is insufficient for critical infrastructure migration and may cause operational disruption.",
+        "recommendedFix": "Extend termination without cause to 180 days with mandatory transition assistance period and data return obligations."
+      }
+    ]
+  },
+  {
     "id": "c-1782022462",
     "docName": "AcmeCorp_HighRisk_SLA.txt",
     "vendorName": "Acmecorp Highrisk Sla.Txt",

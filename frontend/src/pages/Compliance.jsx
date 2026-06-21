@@ -44,7 +44,10 @@ export default function Compliance({ vendors, setNotifications, complianceStanda
   };
 
   const filteredVendors = vendors.filter(v => {
-    return v.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const term = searchTerm.toLowerCase();
+    return v.name.toLowerCase().includes(term) ||
+           (v.industry && v.industry.toLowerCase().includes(term)) ||
+           (v.vendorType && v.vendorType.toLowerCase().includes(term));
   });
 
   const handleSendReminder = (vendorName, reqName) => {
@@ -97,8 +100,14 @@ export default function Compliance({ vendors, setNotifications, complianceStanda
       {/* Page Title */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold font-display text-white">Compliance & Governance</h2>
-          <p className="text-xs text-slate-500 mt-0.5 font-light">Track compliance alignments across SOC2, GDPR, and ISO27001 audit standards</p>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="badge badge-emerald">Auditing</span>
+            <span className="badge badge-cyan">Governance Matrix</span>
+          </div>
+          <h2 className="text-2xl font-display font-black text-white uppercase tracking-wider">
+            Compliance <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.25)]">& Governance</span>
+          </h2>
+          <p className="text-xs text-slate-300 mt-1 font-medium">Track compliance alignments across SOC2, GDPR, and ISO27001 audit standards</p>
         </div>
         <button 
           onClick={handleExportMatrix}
@@ -158,111 +167,142 @@ export default function Compliance({ vendors, setNotifications, complianceStanda
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            {/* Requirement Checklist */}
-            <div className="glass-panel rounded-xl p-5 lg:col-span-2 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-900">
-                <h4 className="font-display font-semibold text-sm text-white flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-blue-500" /> Audit Control Framework Requirements ({selectedStandard})
-                </h4>
-              </div>
-
-              <div className="space-y-4">
-                {standardsRequirements[selectedStandard]?.map((req) => {
-                  const failingVendors = vendors.filter(v => getComplianceStatus(v, selectedStandard) !== "Compliant");
-                  
-                  return (
-                    <div key={req.id} className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/80 space-y-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-semibold text-xs text-white">{req.name}</p>
-                          <p className="text-[11px] text-slate-400 mt-1 font-light leading-relaxed">{req.desc}</p>
-                        </div>
-                      </div>
-
-                      {failingVendors.length > 0 && (
-                        <div className="pt-2 border-t border-slate-900/50">
-                          <span className="text-[9px] text-slate-500 uppercase tracking-widest font-bold block mb-2">Non-Compliant Vendors ({failingVendors.length})</span>
-                          <div className="flex flex-wrap gap-2">
-                            {failingVendors.map(fv => (
-                              <div key={fv.id} className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-red-500/10 border border-red-500/10 text-[10px] text-red-300">
-                                <span>{fv.name}</span>
-                                <button 
-                                  onClick={() => handleSendReminder(fv.name, req.name)}
-                                  className="text-[9px] text-red-400 hover:text-white transition-colors flex items-center gap-0.5 cursor-pointer"
-                                  title="Send audit reminder ticket"
-                                >
-                                  <Send className="w-2.5 h-2.5 ml-1" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* Vendors Status Grid side */}
-            <div className="glass-panel rounded-xl p-5 flex flex-col justify-between h-full space-y-4">
-              <div>
-                <h4 className="font-display font-semibold text-sm text-white flex items-center gap-2">
-                  <FileCheck className="w-4 h-4 text-blue-500" /> Vendor Alignments Matrix
-                </h4>
-                <p className="text-xs text-slate-500 mt-0.5">Alignment checklist by search term</p>
-              </div>
-
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search vendors..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-slate-900/60 border border-slate-800 rounded-lg py-1.5 pl-8 pr-4 text-xs text-slate-300 placeholder-slate-500 focus:outline-none"
-                />
-                <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-500" />
+            <div className="glass-panel rounded-xl p-5 flex flex-col justify-between h-full space-y-4 lg:col-span-2">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h4 className="font-display font-semibold text-sm text-white flex items-center gap-2">
+                    <FileCheck className="w-4 h-4 text-blue-500" /> Vendor Alignments Matrix
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-0.5">Comprehensive compliance standard mapping for all vendors</p>
+                </div>
+                <div className="relative w-full md:w-64">
+                  <input
+                    type="text"
+                    placeholder="Search vendors or categories..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-slate-900/60 border border-slate-800 rounded-lg py-1.5 pl-8 pr-4 text-xs text-slate-300 placeholder-slate-500 focus:outline-none"
+                  />
+                  <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-500" />
+                </div>
               </div>
 
               <div className="overflow-y-auto max-h-[500px] flex-grow pr-1 custom-scrollbar">
                 <table className="w-full text-left border-collapse">
                   <thead className="sticky top-0 bg-[#0a0a0a]/90 backdrop-blur z-10 text-[9px] uppercase tracking-widest text-slate-500 font-mono">
                     <tr>
-                      <th className="py-2 px-3 font-medium border-b border-slate-800">Vendor Identity</th>
-                      <th className="py-2 px-3 font-medium border-b border-slate-800 text-right">Status</th>
+                      <th className="py-3 px-4 font-medium border-b border-slate-800">Vendor Identity</th>
+                      <th className="py-3 px-2 font-medium border-b border-slate-800 text-center">SOC2</th>
+                      <th className="py-3 px-2 font-medium border-b border-slate-800 text-center">ISO 27001</th>
+                      <th className="py-3 px-2 font-medium border-b border-slate-800 text-center">GDPR</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/50">
                     {filteredVendors.map((vendor) => {
-                      const status = getComplianceStatus(vendor, selectedStandard);
+                      const soc2Val = vendor.complianceStatus?.SOC2 || "Non-Compliant";
+                      const isoVal = vendor.complianceStatus?.ISO27001 || "Non-Compliant";
+                      const gdprVal = vendor.complianceStatus?.GDPR || "Non-Compliant";
                       return (
                         <tr key={vendor.id} className="hover:bg-slate-900/40 transition-colors group">
-                          <td className="py-3 px-3">
-                            <p className="font-semibold text-slate-200 text-xs truncate max-w-[150px]">{vendor.name}</p>
-                            <p className="text-[9px] text-slate-500 mt-0.5 font-mono">{vendor.industry || vendor.type || "Vendor"}</p>
+                          <td className="py-3 px-4">
+                            <p className="font-semibold text-slate-200 text-xs truncate max-w-[200px]" title={vendor.name}>{vendor.name}</p>
+                            <p className="text-[10px] text-slate-500 font-mono mt-0.5 truncate max-w-[200px]">{vendor.industry || vendor.type || "Vendor"}</p>
                           </td>
-                          <td className="py-3 px-3 text-right">
-                            <div className="inline-flex justify-end">
-                              {status === "Compliant" ? (
-                                <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors">
-                                  <CheckCircle2 className="w-3 h-3" /> Compliant
-                                </span>
-                              ) : status === "Partial" ? (
-                                <span className="flex items-center gap-1 text-[10px] text-yellow-400 font-semibold bg-yellow-500/10 px-2 py-0.5 rounded border border-yellow-500/20 group-hover:bg-yellow-500/20 transition-colors">
-                                  <AlertTriangle className="w-3 h-3" /> Partial
-                                </span>
-                              ) : (
-                                <span className="flex items-center gap-1 text-[10px] text-red-400 font-semibold bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20 group-hover:bg-red-500/20 transition-colors">
-                                  <XCircle className="w-3 h-3" /> Failed
-                                </span>
-                              )}
-                            </div>
+                          <td className="py-3 px-2 text-center">
+                            <span 
+                              className={`inline-flex px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                                soc2Val === "Compliant" 
+                                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
+                                  : soc2Val === "Partial"
+                                  ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                                  : "bg-red-500/10 text-red-400 border border-red-500/20"
+                              }`}
+                              title={`SOC2: ${soc2Val}`}
+                            >
+                              {soc2Val === "Compliant" ? "Pass" : soc2Val === "Partial" ? "Part" : "Fail"}
+                            </span>
+                          </td>
+                          <td className="py-3 px-2 text-center">
+                            <span 
+                              className={`inline-flex px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                                isoVal === "Compliant" 
+                                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
+                                  : isoVal === "Partial"
+                                  ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                                  : "bg-red-500/10 text-red-400 border border-red-500/20"
+                              }`}
+                              title={`ISO27001: ${isoVal}`}
+                            >
+                              {isoVal === "Compliant" ? "Pass" : isoVal === "Partial" ? "Part" : "Fail"}
+                            </span>
+                          </td>
+                          <td className="py-3 px-2 text-center">
+                            <span 
+                              className={`inline-flex px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                                gdprVal === "Compliant" 
+                                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
+                                  : gdprVal === "Partial"
+                                  ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                                  : "bg-red-500/10 text-red-400 border border-red-500/20"
+                              }`}
+                              title={`GDPR: ${gdprVal}`}
+                            >
+                              {gdprVal === "Compliant" ? "Pass" : gdprVal === "Partial" ? "Part" : "Fail"}
+                            </span>
                           </td>
                         </tr>
                       );
                     })}
                   </tbody>
                 </table>
+              </div>
+            </div>
+
+            {/* Requirement Checklist */}
+            <div className="glass-panel rounded-xl p-5 lg:col-span-1 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-900">
+                <h4 className="font-display font-semibold text-sm text-white flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-blue-500" /> Control Framework ({selectedStandard})
+                </h4>
+              </div>
+
+              <div className="space-y-4 overflow-y-auto max-h-[480px] pr-1 custom-scrollbar">
+                {standardsRequirements[selectedStandard]?.map((req) => {
+                  const failingVendors = vendors.filter(v => getComplianceStatus(v, selectedStandard) !== "Compliant");
+                  
+                  return (
+                    <div key={req.id} className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/80 space-y-3">
+                      <div>
+                        <p className="font-semibold text-xs text-white">{req.name}</p>
+                        <p className="text-[11px] text-slate-400 mt-1 font-light leading-relaxed">{req.desc}</p>
+                      </div>
+
+                      {failingVendors.length > 0 && (
+                        <div className="pt-2 border-t border-slate-900/50">
+                          <span className="text-[9px] text-slate-500 uppercase tracking-widest font-bold block mb-2">Non-Compliant ({failingVendors.length})</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {failingVendors.slice(0, 8).map(fv => (
+                              <div key={fv.id} className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/10 text-[9px] text-red-300">
+                                <span className="truncate max-w-[60px]">{fv.name}</span>
+                                <button 
+                                  onClick={() => handleSendReminder(fv.name, req.name)}
+                                  className="text-red-400 hover:text-white transition-colors cursor-pointer"
+                                  title="Send audit reminder ticket"
+                                >
+                                  <Send className="w-2 h-2 ml-0.5" />
+                                </button>
+                              </div>
+                            ))}
+                            {failingVendors.length > 8 && (
+                              <span className="text-[9px] text-slate-500 self-center">+{failingVendors.length - 8} more</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

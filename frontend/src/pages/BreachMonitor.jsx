@@ -5,7 +5,7 @@ import {
   RefreshCw, Radio, Zap, Clock, Activity
 } from "lucide-react";
 import { fetchBreachFeed, fetchVendorBreaches } from "../utils/api";
-import ProductionBanner from "../components/ProductionBanner";
+
 
 export default function BreachMonitor({ vendors }) {
   const [feed, setFeed] = useState([]);
@@ -61,23 +61,21 @@ export default function BreachMonitor({ vendors }) {
 
   return (
     <div className="p-6 space-y-6">
-      <ProductionBanner 
-        title="Production Deployment: Live Threat Intelligence" 
-        description="This module dynamically scrapes real-world security advisories, Google News RSS, and the CISA Known Exploited Vulnerabilities (KEV) catalog. It automatically alerts you if any vendor in your registry is mentioned in a zero-day exploit or breach."
-      />
-
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="flex h-2 w-2 relative">
+          <div className="flex items-center gap-3 mb-1.5">
+            <span className="flex h-2.5 w-2.5 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
             </span>
-            <span className="text-[10px] bg-red-500/15 border border-red-500/30 text-red-400 px-2 py-0.5 rounded font-mono uppercase tracking-widest">Live Monitoring</span>
+            <span className="badge badge-red">Live threat intel</span>
+            <span className="badge badge-orange">Zero-Day Radar</span>
           </div>
-          <h2 className="text-xl font-bold font-display text-white">Breach Monitoring Center</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Real-time cybersecurity threat intelligence feed with vendor correlation</p>
+          <h2 className="text-2xl font-display font-black text-white uppercase tracking-wider">
+            Breach <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 drop-shadow-[0_0_15px_rgba(239,68,68,0.25)]">Monitoring Center</span>
+          </h2>
+          <p className="text-xs text-slate-300 mt-1 font-medium">Real-time cybersecurity threat intelligence feed with vendor correlation</p>
         </div>
         <button
           onClick={handleRefresh}

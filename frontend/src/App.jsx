@@ -38,7 +38,7 @@ export default function App() {
         const backendVendors = await fetchVendors();
         if (backendVendors && backendVendors.length > 0) {
           setVendors(backendVendors);
-          
+
           // Generate expiry alerts dynamically
           const alerts = [];
           backendVendors.forEach(v => {
@@ -57,31 +57,31 @@ export default function App() {
             }
           });
           setExpiryAlerts(alerts);
-          
+
           // Fetch contracts from backend
           const backendContracts = await fetchContracts();
           if (backendContracts) setContracts(backendContracts);
-          
+
           // Fetch compliance standards fallback
           const defaultCompliance = {
             "SOC2": [
-              {"id": "req-s1", "name": "CC6.1 - Logical Access Control", "desc": "MFA, SSO, and endpoint protection must be active for all staff."},
-              {"id": "req-s2", "name": "CC6.3 - Perimeter Defenses", "desc": "Vulnerability scanners and firewall rules must be reviewed monthly."},
-              {"id": "req-s3", "name": "CC7.1 - Vulnerability Management", "desc": "Pen tests annually; critical findings patched within 30 days."}
+              { "id": "req-s1", "name": "CC6.1 - Logical Access Control", "desc": "MFA, SSO, and endpoint protection must be active for all staff." },
+              { "id": "req-s2", "name": "CC6.3 - Perimeter Defenses", "desc": "Vulnerability scanners and firewall rules must be reviewed monthly." },
+              { "id": "req-s3", "name": "CC7.1 - Vulnerability Management", "desc": "Pen tests annually; critical findings patched within 30 days." }
             ],
             "ISO27001": [
-              {"id": "req-i1", "name": "A.9.2 - User Access Mgmt", "desc": "Formal authorization process for privileged developer roles."},
-              {"id": "req-i2", "name": "A.12.6 - Tech Vulnerabilities", "desc": "Patches cataloged and deployed systematically by security level."},
-              {"id": "req-i3", "name": "A.10.1 - Cryptographic Controls", "desc": "Sensitive data encrypted at rest and in transit."}
+              { "id": "req-i1", "name": "A.9.2 - User Access Mgmt", "desc": "Formal authorization process for privileged developer roles." },
+              { "id": "req-i2", "name": "A.12.6 - Tech Vulnerabilities", "desc": "Patches cataloged and deployed systematically by security level." },
+              { "id": "req-i3", "name": "A.10.1 - Cryptographic Controls", "desc": "Sensitive data encrypted at rest and in transit." }
             ],
             "GDPR": [
-              {"id": "req-g1", "name": "Article 32 - Security of Processing", "desc": "Pseudo-anonymization and log auditing on user database assets."},
-              {"id": "req-g2", "name": "Article 28 - Subprocessor Agreements", "desc": "Contracts must declare all downstream subprocessors."},
-              {"id": "req-g3", "name": "Article 33 - Breach Notification", "desc": "Client notification within 72 hours of security incidents."}
+              { "id": "req-g1", "name": "Article 32 - Security of Processing", "desc": "Pseudo-anonymization and log auditing on user database assets." },
+              { "id": "req-g2", "name": "Article 28 - Subprocessor Agreements", "desc": "Contracts must declare all downstream subprocessors." },
+              { "id": "req-g3", "name": "Article 33 - Breach Notification", "desc": "Client notification within 72 hours of security incidents." }
             ]
           };
           setComplianceStandards(defaultCompliance);
-          
+
           // Fetch recent activities from global feed
           const feedRes = await fetchBreachFeed();
           if (feedRes && feedRes.feed) {
@@ -101,7 +101,7 @@ export default function App() {
         console.warn("Backend unavailable:", err);
       }
     }
-    
+
     loadAllData();
   }, []);
 
@@ -110,7 +110,7 @@ export default function App() {
     if (!vendors || vendors.length === 0) {
       return { label: "SECURE", color: "text-emerald-400", border: "border-emerald-500/20", bg: "bg-emerald-500/10" };
     }
-    
+
     const averageRisk = vendors.reduce((acc, curr) => acc + curr.riskScore, 0) / vendors.length;
     const hasBreaches = vendors.some(v => v.activeBreaches > 0);
     const hasCritical = vendors.some(v => v.riskLevel === "Critical");
@@ -136,19 +136,23 @@ export default function App() {
     const getBgUrl = () => {
       switch (activeTab) {
         case "vendors": return "url('/cyber_vendors_bg.png')";
-        case "riskAnalysis": 
+        case "riskAnalysis":
         case "futureRisk":
         case "breachMonitor": return "url('/cyber_risk_bg.png')";
-        case "compliance": 
+        case "compliance":
         case "auditReport": return "url('/cyber_compliance_bg.png')";
         case "contractAI": return "url('/cyber_contract_bg.png')";
         case "dashboard":
         default: return "url('/cyber_sentinel_bg.png')";
       }
     };
-    
+
     // Apply background with our sleek dark overlay gradient
-    document.body.style.backgroundImage = `linear-gradient(rgba(3, 7, 18, 0.85), rgba(3, 7, 18, 0.95)), ${getBgUrl()}`;
+    document.body.style.backgroundImage = `linear-gradient(rgba(4, 9, 24, 0.76), rgba(3, 5, 14, 0.88)), ${getBgUrl()}`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundAttachment = "fixed";
+    document.body.style.backgroundRepeat = "no-repeat";
   }, [activeTab]);
 
   // Router dispatcher
@@ -156,7 +160,7 @@ export default function App() {
     switch (activeTab) {
       case "dashboard":
         return (
-          <DashboardHome 
+          <DashboardHome
             vendors={vendors}
             expiryAlerts={expiryAlerts}
             recentActivities={recentActivities}
@@ -167,7 +171,7 @@ export default function App() {
         );
       case "vendors":
         return (
-          <Vendors 
+          <Vendors
             vendors={vendors}
             setVendors={setVendors}
             selectedVendor={selectedVendor}
@@ -178,7 +182,7 @@ export default function App() {
         );
       case "riskAnalysis":
         return (
-          <RiskAnalysis 
+          <RiskAnalysis
             vendors={vendors}
             setVendors={setVendors}
             setNotifications={setNotifications}
@@ -186,7 +190,7 @@ export default function App() {
         );
       case "compliance":
         return (
-          <Compliance 
+          <Compliance
             vendors={vendors}
             setNotifications={setNotifications}
             complianceStandards={complianceStandards}
@@ -198,7 +202,7 @@ export default function App() {
         );
       case "futureRisk":
         return (
-          <FutureRisk 
+          <FutureRisk
             vendors={vendors}
             setActiveTab={setActiveTab}
             setSelectedVendor={setSelectedVendor}
@@ -239,27 +243,26 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent flex print:block font-sans selection:bg-blue-600/30 selection:text-white relative overflow-hidden print:overflow-visible">
+    <div className="h-screen w-screen bg-transparent flex print:block font-sans selection:bg-indigo-600/30 selection:text-white relative overflow-hidden print:overflow-visible">
+      {/* Background Orbs */}
+      <div className="orb w-[700px] h-[700px]" style={{ top: "-200px", right: "-200px", background: "radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)" }} />
+      <div className="orb w-[500px] h-[500px]" style={{ bottom: "-150px", left: "-100px", background: "radial-gradient(circle, rgba(34,211,238,0.05) 0%, transparent 70%)" }} />
 
-      {/* Background Graphic Accents */}
-      <div className="absolute top-0 right-0 w-[45rem] h-[45rem] bg-blue-900/10 rounded-full blur-[10rem] pointer-events-none z-0"></div>
-      <div className="absolute bottom-0 left-0 w-[35rem] h-[35rem] bg-indigo-900/5 rounded-full blur-[8rem] pointer-events-none z-0"></div>
-      
       {/* Sidebar Navigation */}
-      <Sidebar 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
         collapsed={collapsed}
         setCollapsed={setCollapsed}
         onSignOut={() => setShowLanding(true)}
       />
 
       {/* Main Panel Shell */}
-      <div className="flex-1 flex flex-col print:block min-w-0 z-10 relative">
+      <div className="flex-1 flex flex-col print:block min-w-0 z-10 relative overflow-hidden h-screen">
         {/* Top Navbar */}
-        <Navbar 
-          activeTab={activeTab} 
-          notifications={notifications} 
+        <Navbar
+          activeTab={activeTab}
+          notifications={notifications}
           setNotifications={setNotifications}
           threatLevel={threatLevel}
         />
@@ -269,10 +272,10 @@ export default function App() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
             >
               {renderTabContent()}
             </motion.div>

@@ -562,25 +562,25 @@ class VendorRiskModel:
                     },
                 ],
                 "contacts": {
-                    "name": f"Security Ops - {clean_value(row.get('vendor_name', vid), vid)}",
-                    "email": f"secops@{str(clean_value(row.get('vendor_name', vid), vid)).lower().replace(' ', '').replace('_', '')}.com",
+                    "name": clean_value(row.get("contact_name", f"Security Ops - {vid}"), f"Security Ops - {vid}"),
+                    "email": clean_value(row.get("contact_email", f"secops@{vid.lower().replace(' ', '').replace('_', '')}.com"), f"secops@{vid.lower().replace(' ', '').replace('_', '')}.com"),
                 },
                 "subprocessors": max(1, int(row.get("risk_score", 50)) // 10),
-                "dataAssetsShared": row.get("data_access", "Standard"),
+                "dataAssetsShared": row.get("data_access_scope", row.get("data_access", "Standard")),
                 "mlPrediction": pred,
                 "shapFactors": shp.get("top_factors", []),
                 "vendorType": row.get("vendor_type", "Unknown"),
-                "financialRating": clean_value(row.get("financial_rating", "N/A"), "N/A"),
+                "financialRating": "N/A",
                 "annualSpend": int(row.get("annual_spend", 0)),
-                "contractStart": str(row.get("contract_start", "")),
-                "contractEnd": str(row.get("contract_end", "")),
+                "contractStart": "N/A",
+                "contractEnd": str(row.get("contract_end_date", row.get("contract_end", ""))),
                 "soc2Expiry": str(row.get("soc2_expiry", "")),
                 "isoExpiry": str(row.get("iso27001_expiry", "")),
                 "breachStatus": bool(row.get("breached_recently", 0)),
-                "breachHistory": clean_value(row.get("breach_history", ""), ""),
-                "gdprDpa": str(row.get("gdpr_dpa", "True")).lower() == "true",
-                "investigationStatus": str(row.get("investigation_status", "False")).lower() == "true",
-                "activeAccess": str(row.get("active_access", "True")).lower() == "true",
+                "breachHistory": clean_value(row.get("breach_status", ""), ""),
+                "gdprDpa": bool(row.get("missing_gdpr_dpa", 0) == 0),
+                "investigationStatus": bool(row.get("under_investigation", 0) == 1),
+                "activeAccess": True,
                 "knownVendorCount": int(row.get("known_vendor_count", len(self.features_df))),
                 "groundTruthHighRisk": str(row.get("ground_truth_high_risk", "False")).lower() == "true",
                 "daysUntilSoc2Expiry": int(row.get("days_until_soc2_expiry", 0)),
@@ -615,29 +615,31 @@ class VendorRiskModel:
         
         # Determine breach status
         breach_status = "False"
+        breach_status_str = "No_Known_Breach"
         if int(data.get("riskScore", 50)) > 80:
             breach_status = "True"
+            breach_status_str = "Recent_Breach_12mo"
             
         new_registry_row = {
             "vendor_id": new_id,
             "vendor_name": data.get("name"),
-            "vendor_type": data.get("industry"),
-            "data_access": data.get("dataAssetsShared", "ReadOnly"),
-            "soc2_expiry": soc2_exp,
-            "iso27001_expiry": iso_exp,
-            "breach_status": breach_status,
+            "vendor_type": data.get("industry", "Cloud"),
+            "contact_name": data.get("contacts", {}).get("name", "Unknown Contact"),
+            "contact_email": data.get("contacts", {}).get("email", "unknown@example.com"),
+            "compliance_certifications": f"SOC2:{soc2_exp}|ISO27001:{iso_exp}|GDPR:2026-01-01",
+            "data_access_scope": data.get("dataAssetsShared", "Internal_Data"),
             "risk_score": int(data.get("riskScore", 50)),
+            "breach_status": breach_status_str,
             "annual_spend": int(data.get("annualSpend", 250000)),
-            "contract_start": contract_start,
-            "contract_end": contract_end,
-            "financial_rating": data.get("financialRating", "A")
+            "contract_end_date": contract_end,
+            "last_audit_date": ref_date.strftime("%Y-%m-%d")
         }
         
         # 4. Create labels entry
         is_anomaly = 1 if int(data.get("riskScore", 50)) > 50 else 0
         anomaly_type = "NONE"
         if breach_status == "True":
-            anomaly_type = "BREACHED_VENDOR_HIGH_ACCESS" if data.get("dataAssetsShared") in ("PII", "Financial") else "RECENTLY_BREACHED_VENDOR"
+            anomaly_type = "BREACHED_VENDOR_HIGH_ACCESS" if data.get("dataAssetsShared") in ("PII", "Financial", "Customer_PII") else "RECENTLY_BREACHED_VENDOR"
         elif data.get("SOC2") != "Compliant" or data.get("ISO27001") != "Compliant":
             anomaly_type = "EXPIRED_CERTIFICATION"
         elif int(data.get("riskScore", 50)) > 70:
@@ -653,7 +655,8 @@ class VendorRiskModel:
             severity_val = "MEDIUM"
             
         new_labels_row = {
-            "vendor_id": new_id,
+            "record_id": new_id,
+            "vendor_name": data.get("name"),
             "is_anomaly": is_anomaly,
             "anomaly_type": anomaly_type,
             "severity": severity_val,
@@ -688,7 +691,10 @@ class VendorRiskModel:
             return False
             
         new_registry_df = registry_df[registry_df["vendor_id"] != vendor_id]
-        new_labels_df = labels_df[labels_df["vendor_id"] != vendor_id]
+        if "record_id" in labels_df.columns:
+            new_labels_df = labels_df[labels_df["record_id"] != vendor_id]
+        else:
+            new_labels_df = labels_df[labels_df["vendor_id"] != vendor_id]
         
         new_registry_df.to_csv(REGISTRY_PATH, index=False)
         new_labels_df.to_csv(LABELS_PATH, index=False)
@@ -717,13 +723,21 @@ class VendorRiskModel:
         # Apply compliance changes based on controls
         ref_date = datetime(2026, 6, 21)
         
-        # If SOC2 is completed, set expiry to 365 days in future
+        # Extract existing compliance string
+        cert_str = str(registry_df.at[idx, "compliance_certifications"]) if "compliance_certifications" in registry_df.columns else ""
+        certs = {}
+        if cert_str and cert_str != "nan":
+            for item in cert_str.split('|'):
+                if ':' in item:
+                    k, v = item.split(':', 1)
+                    certs[k.strip()] = v.strip()
+                
         if controls.get("soc2Completed"):
-            registry_df.at[idx, "soc2_expiry"] = (ref_date + timedelta(days=365)).strftime("%Y-%m-%d")
-            
-        # If encryption is enabled, set ISO expiry to 365 days in future
+            certs["SOC2"] = (ref_date + timedelta(days=365)).strftime("%Y-%m-%d")
         if controls.get("encryptionEnabled"):
-            registry_df.at[idx, "iso27001_expiry"] = (ref_date + timedelta(days=365)).strftime("%Y-%m-%d")
+            certs["ISO27001"] = (ref_date + timedelta(days=365)).strftime("%Y-%m-%d")
+            
+        registry_df.at[idx, "compliance_certifications"] = "|".join([f"{k}:{v}" for k,v in certs.items()])
             
         # If MFA is enforced, reduce risk score and mark certification valid
         score_reduction = 0
@@ -742,19 +756,19 @@ class VendorRiskModel:
         
         # If score is reduced significantly or breach is contained, set breach_status to False
         if new_score < 50:
-            registry_df.at[idx, "breach_status"] = "False"
+            registry_df.at[idx, "breach_status"] = "No_Known_Breach"
             
         # Update labels entry
         is_anomaly = 1 if new_score > 50 else 0
         
         # Recalculate anomaly type and severity
         breach_status = registry_df.at[idx, "breach_status"]
-        data_access = registry_df.at[idx, "data_access"]
+        data_access = registry_df.at[idx, "data_access_scope"]
         
         anomaly_type = "NONE"
-        if breach_status == "True":
-            anomaly_type = "BREACHED_VENDOR_HIGH_ACCESS" if data_access in ("PII", "Financial") else "RECENTLY_BREACHED_VENDOR"
-        elif pd.to_datetime(registry_df.at[idx, "soc2_expiry"]) < ref_date or pd.to_datetime(registry_df.at[idx, "iso27001_expiry"]) < ref_date:
+        if breach_status in ("Recent_Breach_12mo", "True"):
+            anomaly_type = "BREACHED_VENDOR_HIGH_ACCESS" if data_access in ("PII", "Financial_Data", "Customer_PII") else "RECENTLY_BREACHED_VENDOR"
+        elif ("SOC2" in certs and pd.to_datetime(certs["SOC2"]) < ref_date) or ("ISO27001" in certs and pd.to_datetime(certs["ISO27001"]) < ref_date):
             anomaly_type = "EXPIRED_CERTIFICATION"
         elif new_score > 70:
             anomaly_type = "HIGH_RISK_SCORE"

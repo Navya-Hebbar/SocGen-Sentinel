@@ -5,8 +5,8 @@ import {
   Sparkles, CheckCircle, FileCheck, RefreshCw, 
   Printer, Download, Shield, Gavel
 } from "lucide-react";
-import ProductionBanner from "../components/ProductionBanner";
 import { uploadContract } from "../utils/api";
+
 
 export default function ContractAI({ contracts, setContracts }) {
   const [selectedContractId, setSelectedContractId] = useState("");
@@ -128,8 +128,14 @@ export default function ContractAI({ contracts, setContracts }) {
       {/* Print Action Bar */}
       <div className="w-full max-w-6xl flex justify-between items-end mb-4 print:hidden">
         <div className="max-w-xl">
-          <h2 className="text-2xl font-bold font-display text-white">Contract AI Intelligence</h2>
-          <p className="text-xs text-slate-400 mt-1">Upload an SLA or MSA PDF. The Gemini AI engine will parse the text and flag dangerous liability caps and compliance violations.</p>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="badge badge-blue">Gemini NLP</span>
+            <span className="badge badge-indigo">Legal Parsing</span>
+          </div>
+          <h2 className="text-2xl font-display font-black text-white uppercase tracking-wider">
+            Contract <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.25)]">AI Intelligence</span>
+          </h2>
+          <p className="text-xs text-slate-300 mt-1 font-medium">Upload an SLA or MSA PDF. The Gemini AI engine will parse the text and flag dangerous liability caps and compliance violations.</p>
         </div>
         <button
           onClick={handlePrint}

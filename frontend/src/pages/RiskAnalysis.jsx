@@ -142,8 +142,14 @@ export default function RiskAnalysis({ vendors, setVendors, setNotifications }) 
     <div className="p-6 space-y-6">
       {/* Tab Header */}
       <div>
-        <h2 className="text-xl font-bold font-display text-white">Risk Intelligence Modeling</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Use AI sandbox to run What-If threat mitigation plans and estimate exposure index</p>
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="badge badge-indigo">Sandbox</span>
+          <span className="badge badge-purple">What-If Analysis</span>
+        </div>
+        <h2 className="text-2xl font-display font-black text-white uppercase tracking-wider">
+          Risk <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(129,140,248,0.25)]">Intelligence Modeling</span>
+        </h2>
+        <p className="text-xs text-slate-300 mt-1 font-medium">Use AI sandbox to run What-If threat mitigation plans and estimate exposure index</p>
       </div>
 
       {vendor ? (

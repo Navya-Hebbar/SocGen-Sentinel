@@ -19,7 +19,7 @@ import {
 
 // Import API Helpers
 import { createVendor, deleteVendor } from "../utils/api";
-import ProductionBanner from "../components/ProductionBanner";
+
 
 export default function Vendors({ 
   vendors, 
@@ -227,16 +227,17 @@ export default function Vendors({
         </div>
       )}
 
-      <ProductionBanner 
-        title="Production Deployment: Vendor Risk Evaluation Engine" 
-        description="Register real enterprise vendors here. The backend XGBoost Machine Learning model will immediately cross-reference their data access level, compliance posture, and financial spend to compute a real-time Risk Severity matrix."
-      />
-
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-xl font-bold font-display text-white">Centralized Vendor Registry</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Inventory repository containing profiles, risk evaluations, and alignment check logs</p>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="badge badge-blue">Registry</span>
+            <span className="badge badge-cyan">Real-time Profiles</span>
+          </div>
+          <h2 className="text-2xl font-display font-black text-white uppercase tracking-wider">
+            Centralized <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.25)]">Vendor Registry</span>
+          </h2>
+          <p className="text-xs text-slate-300 mt-1 font-medium">Inventory repository containing profiles, risk evaluations, and alignment check logs</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}

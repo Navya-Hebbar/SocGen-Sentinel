@@ -115,11 +115,14 @@ export default function FutureRisk({ vendors, setActiveTab, setSelectedVendor })
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[10px] bg-purple-500/15 border border-purple-500/30 text-purple-400 px-2 py-0.5 rounded font-mono uppercase tracking-widest">Predictive Intelligence</span>
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="badge badge-purple">Predictive Intelligence</span>
+          <span className="badge badge-pink">ML Trajectory</span>
         </div>
-        <h2 className="text-xl font-bold font-display text-white">Future Risk Prediction</h2>
-        <p className="text-xs text-slate-500 mt-0.5">ML-powered risk trajectory forecasting — predict vendor escalation before it happens</p>
+        <h2 className="text-2xl font-display font-black text-white uppercase tracking-wider">
+          Future <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 drop-shadow-[0_0_15px_rgba(167,139,250,0.25)]">Risk Prediction</span>
+        </h2>
+        <p className="text-xs text-slate-300 mt-1 font-medium">ML-powered risk trajectory forecasting — predict vendor escalation before it happens</p>
       </div>
 
       {loading ? (
