@@ -49,8 +49,7 @@ backend/eval_model.py
 backend/test_model.py
 backend/ml/seed_real_vendors.py
 
-# ─── Old Screenshots (outdated after redesign) ─────
-screenshots/
+# ─── Screenshots (redesigned) ─────
 
 # ─── Root-level duplicate data files ────────────────
 # Canonical copies live in backend/ml/ — root copies are redundant

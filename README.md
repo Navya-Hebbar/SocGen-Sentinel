@@ -2,6 +2,8 @@
   <img src="frontend/public/socgen_seal.png" width="120" alt="SocGen Seal"/>
   <h1>SocGen Sentinel</h1>
   <p><strong>AI-Powered Enterprise Third-Party Risk Intelligence Platform</strong></p>
+  <br/>
+  <img src="screenshots/welcome_page.png" width="90%" alt="SocGen Sentinel Welcome Page"/>
 </div>
 
 ---
