@@ -8,7 +8,8 @@ import json
 from datetime import datetime
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional
 
@@ -617,6 +618,20 @@ async def risk_sample_walkthrough():
     """Return the expected challenge walkthrough input/output pair."""
     return sample_walkthrough()
 
+# =====================================================================
+# STATIC FRONTEND SERVING (PRODUCTION)
+# =====================================================================
+frontend_dist = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+if os.path.exists(frontend_dist):
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+    
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        # Serve the index.html for all unmatched non-API paths (React SPA)
+        file_path = os.path.join(frontend_dist, full_path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(frontend_dist, "index.html"))
 
 if __name__ == "__main__":
     import uvicorn
