@@ -32,6 +32,9 @@ Built on a high-performance **Python FastAPI** server, the intelligence layer ha
 
 ### 3. Presentation Layer (Frontend)
 A highly responsive **React + Vite** SPA (Single Page Application) utilizing **Tailwind CSS** for a premium, dark-mode cybersecurity aesthetic.
+
+![Sentinel Dashboard UI](screen_dashboard.png)
+
 * Maintains complex global state using React Hooks.
 * Renders real-time data visualizations (Heatmaps, Risk Distributions, Progress Arcs).
 * Triggers dynamic, asynchronous interactions with the Intelligence Engine.
